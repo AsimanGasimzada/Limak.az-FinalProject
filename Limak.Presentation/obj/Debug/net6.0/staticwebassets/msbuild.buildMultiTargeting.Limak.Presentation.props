@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\Limak.Presentation.props" />
+</Project>

@@ -1,0 +1,17 @@
+C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\bin\Debug\net6.0\Limak.Infrastructure.deps.json
+C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\bin\Debug\net6.0\Limak.Infrastructure.dll
+C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\bin\Debug\net6.0\Limak.Infrastructure.pdb
+C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\bin\Debug\net6.0\Limak.Application.dll
+C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\bin\Debug\net6.0\Limak.Domain.dll
+C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\bin\Debug\net6.0\Limak.Application.pdb
+C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\bin\Debug\net6.0\Limak.Domain.pdb
+C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\obj\Debug\net6.0\Limak.Infrastructure.csproj.AssemblyReference.cache
+C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\obj\Debug\net6.0\Limak.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\obj\Debug\net6.0\Limak.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\obj\Debug\net6.0\Limak.Infrastructure.AssemblyInfo.cs
+C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\obj\Debug\net6.0\Limak.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\obj\Debug\net6.0\Limak.Infrastructure.csproj.CopyComplete
+C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\obj\Debug\net6.0\Limak.Infrastructure.dll
+C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\obj\Debug\net6.0\refint\Limak.Infrastructure.dll
+C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\obj\Debug\net6.0\Limak.Infrastructure.pdb
+C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\obj\Debug\net6.0\ref\Limak.Infrastructure.dll
