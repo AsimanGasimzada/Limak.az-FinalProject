@@ -6,5 +6,6 @@ public record ShopPostDto
 {
     public string Name { get; init; }
     public IFormFile Image{ get; set; }
+    public string WebsitePath{ get; set; }
     public List<int> CategoryIds{ get; set; }
 }

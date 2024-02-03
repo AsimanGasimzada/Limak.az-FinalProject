@@ -15,10 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Limak.Infrastructure\Limak.Infrastructure.csproj" />
     <ProjectReference Include="..\Limak.Persistence\Limak.Persistence.csproj" />
   </ItemGroup>

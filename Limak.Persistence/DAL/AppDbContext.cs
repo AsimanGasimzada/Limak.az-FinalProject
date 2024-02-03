@@ -1,4 +1,6 @@
 ﻿using Limak.Domain.Entities;
+using Limak.Domain.Entities.Common;
+using Limak.Persistence.Interceptors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -6,11 +8,12 @@ using System.Reflection;
 
 namespace Limak.Persistence.DAL;
 
-public class AppDbContext:IdentityDbContext<AppUser,IdentityRole<int>,int>
+public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int>
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options):base(options)
+    private readonly BaseEntityInterceptor _interceptor;
+    public AppDbContext(DbContextOptions<AppDbContext> options, BaseEntityInterceptor interceptor) : base(options)
     {
-        
+        _interceptor = interceptor;
     }
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -18,7 +21,25 @@ public class AppDbContext:IdentityDbContext<AppUser,IdentityRole<int>,int>
         base.OnModelCreating(builder);
     }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+        optionsBuilder.AddInterceptors(_interceptor);
+    }
+
 
     public DbSet<Shop> Shops { get; set; }
     public DbSet<Category> Categories { get; set; }
+    public DbSet<ShopCategory> ShopCategories { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<Status> Statuses { get; set; }
+    public DbSet<Country> Countries { get; set; }
+    public DbSet<Delivery> Deliveries { get; set; }
+    public DbSet<Warehouse> Warehouses { get; set; }
+    public DbSet<Kargomat> Kargomats { get; set; }
+    public DbSet<DeliveryArea> DeliveryAreas { get; set; }
+
+
+
+
 }

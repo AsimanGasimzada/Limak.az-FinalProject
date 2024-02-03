@@ -35,4 +35,24 @@ public class CloudinaryService:ICloudinaryService
         string url = uploadResult.SecureUri.ToString();
         return url;
     }
+    public async Task<bool> FileDeleteAsync(string filename)
+    {
+        var myAccount = new Account
+        {
+            ApiKey = _configuration["CloudinarySettings:APIKey"],
+            ApiSecret = _configuration["CloudinarySettings:APISecret"],
+            Cloud = _configuration["CloudinarySettings:CloudName"]
+        };
+
+        Cloudinary _cloudinary = new Cloudinary(myAccount);
+        _cloudinary.Api.Secure = true;
+
+        var deletionParams = new DeletionParams(filename);
+
+        var deletionResult = await _cloudinary.DestroyAsync(deletionParams);
+
+
+        return deletionResult.Result == "ok";
+    }
+
 }

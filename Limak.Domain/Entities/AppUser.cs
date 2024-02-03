@@ -11,4 +11,10 @@ public class AppUser:IdentityUser<int>
     public DateTime Birtday { get; set; }
     public string Location { get; set; }
     public string Gender { get; set; }
+    public decimal AZNBalance { get; set; }
+    public decimal TRYBalance { get; set; }
+    public decimal USDBalance { get; set; }
+
+    public ICollection<Order> Orders { get; set; }
+
 }

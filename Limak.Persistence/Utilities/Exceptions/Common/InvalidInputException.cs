@@ -1,6 +1,8 @@
-﻿namespace Limak.Persistence.Utilities.Exceptions.Common;
+﻿using Limak.Application.Abstractions.Utilities;
 
-public class InvalidInputException : Exception
+namespace Limak.Persistence.Utilities.Exceptions.Common;
+
+public class InvalidInputException : Exception,IBaseException
 {
     public InvalidInputException(string message = "Invalid input!") : base(message)
     {

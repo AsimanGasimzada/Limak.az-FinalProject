@@ -4,32 +4,57 @@ using Limak.Application.Abstractions.Services;
 using Limak.Application.DTOs.ShopDTOs;
 using Limak.Domain.Entities;
 using Limak.Persistence.Utilities.Exceptions.Common;
+using Limak.Persistence.Utilities.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Limak.Persistence.Implementations.Services;
 
 public class ShopService : IShopService
 {
+    private readonly IShopCategoryService _shopCategoryService;
+    private readonly ICategoryService _categoryService;
     private readonly ICloudinaryService _cloudinaryService;
     private readonly IShopRepository _repository;
     private readonly IMapper _mapper;
 
-    public ShopService(IShopRepository repository, IMapper mapper, ICloudinaryService cloudinaryService)
+    public ShopService(IShopRepository repository, IMapper mapper, ICloudinaryService cloudinaryService, IShopCategoryService shopCategoryService, ICategoryService categoryService)
     {
         _repository = repository;
         _mapper = mapper;
         _cloudinaryService = cloudinaryService;
+        _shopCategoryService = shopCategoryService;
+        _categoryService = categoryService;
     }
 
     public async Task CreateAsync(ShopPostDto dto)
     {
-        throw new NotImplementedException();
+        var isExist = await _repository.IsExistAsync(x => x.Name.ToLower() == dto.Name.ToLower().Trim());
+        if (isExist)
+            throw new AlreadyExistException("Shop is already exist!");
+        foreach (var categoryId in dto.CategoryIds)
+        {
+            if (!await _categoryService.IsExist(categoryId))
+                throw new NotFoundException($"This Category is not found({categoryId})!");
+        }
+
+        dto.Image.ValidateImage();
+        var shop = _mapper.Map<Shop>(dto);
+        shop.ImagePath = await _cloudinaryService.FileCreateAsync(dto.Image);
+
+        foreach (var id in dto.CategoryIds)
+        {
+            await _shopCategoryService.CreateAsync(shop, id);
+        }
+
+        await _repository.CreateAsync(shop);
+        await _repository.SaveAsync();
     }
 
     public async Task DeleteAsync(int id)
     {
         var shop = await _getShop(id);
         _repository.HardDelete(shop);
+        await _cloudinaryService.FileDeleteAsync(shop.ImagePath);
         await _repository.SaveAsync();
     }
 
@@ -70,7 +95,7 @@ public class ShopService : IShopService
         if (id < 1)
             throw new InvalidInputException();
 
-        var shop = await _repository.GetSingleAsync(x => x.Id == id, false, "Category");
+        var shop = await _repository.GetSingleAsync(x => x.Id == id, false, "ShopCategories","Orders");
 
         if (shop is null)
             throw new NotFoundException("Shop is not found");

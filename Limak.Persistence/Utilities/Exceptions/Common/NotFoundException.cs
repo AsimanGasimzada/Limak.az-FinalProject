@@ -1,6 +1,8 @@
-﻿namespace Limak.Persistence.Utilities.Exceptions.Common;
+﻿using Limak.Application.Abstractions.Utilities;
 
-public class NotFoundException : Exception
+namespace Limak.Persistence.Utilities.Exceptions.Common;
+
+public class NotFoundException : Exception,IBaseException
 {
     public NotFoundException(string message = "not found!") : base(message)
     {
