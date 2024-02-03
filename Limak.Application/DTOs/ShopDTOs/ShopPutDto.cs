@@ -8,4 +8,5 @@ public record ShopPutDto
     public string Name { get; init; }
     public string ImagePath { get; init; }
     public IFormFile? Image { get; init; }
+    public List<int> CategoryIds { get; set; }
 }

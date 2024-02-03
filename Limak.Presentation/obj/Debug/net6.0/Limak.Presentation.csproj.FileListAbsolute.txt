@@ -81,3 +81,8 @@ C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\Limak.Infra
 C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\Limak.Persistence.pdb
 C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\Limak.Application.pdb
 C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\Limak.Domain.pdb
+C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\CloudinaryDotNet.dll
+C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\FluentValidation.dll
+C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\FluentValidation.AspNetCore.dll
+C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\FluentValidation.DependencyInjectionExtensions.dll
+C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\Newtonsoft.Json.dll

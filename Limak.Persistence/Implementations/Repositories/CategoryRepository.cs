@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Limak.Application.Abstractions.Repositories;
+using Limak.Domain.Entities;
+using Limak.Persistence.DAL;
+using Limak.Persistence.Implementations.Repositories.Generic;
 
-namespace Limak.Persistence.Implementations.Repositories
+namespace Limak.Persistence.Implementations.Repositories;
+
+public class CategoryRepository : Repository<Category>, ICategoryRepository
 {
-    internal class CategoryRepository
+    public CategoryRepository(AppDbContext context) : base(context)
     {
+
     }
 }
