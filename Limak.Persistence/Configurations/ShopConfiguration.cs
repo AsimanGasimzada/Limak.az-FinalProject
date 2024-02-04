@@ -11,5 +11,6 @@ public class ShopConfiguration : IEntityTypeConfiguration<Shop>
         builder.Property(x=>x.Name).IsRequired().HasMaxLength(128);
         builder.Property(x=>x.ImagePath).IsRequired();
         builder.Property(x=>x.WebsitePath).IsRequired();
+        builder.Property(x => x.CountryId).IsRequired();
     }
 }

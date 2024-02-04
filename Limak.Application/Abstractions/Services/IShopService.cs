@@ -1,12 +1,13 @@
-﻿using Limak.Application.DTOs.ShopDTOs;
+﻿using Limak.Application.DTOs.RepsonseDTOs;
+using Limak.Application.DTOs.ShopDTOs;
 
 namespace Limak.Application.Abstractions.Services;
 
 public interface IShopService
 {
-    Task<List<ShopGetDto>> GetAllAsync(int page=1);
+    Task<List<ShopGetDto>> GetAllAsync(int? country, int? category, int page = 1);
     Task<ShopGetDto> GetByIdAsync(int id);
-    Task CreateAsync(ShopPostDto dto);
-    Task UpdateAsync(ShopPutDto dto);
-    Task DeleteAsync(int id);
+    Task<ResultDto> CreateAsync(ShopPostDto dto);
+    Task<ResultDto> UpdateAsync(ShopPutDto dto);
+    Task<ResultDto> DeleteAsync(int id);
 }

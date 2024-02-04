@@ -8,4 +8,6 @@ public record ShopPostDto
     public IFormFile Image{ get; set; }
     public string WebsitePath{ get; set; }
     public List<int> CategoryIds{ get; set; }
+    public int CountryId { get; set; }
+
 }

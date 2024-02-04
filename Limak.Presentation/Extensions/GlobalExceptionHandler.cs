@@ -1,5 +1,5 @@
 ﻿using Limak.Application.Abstractions.Utilities;
-using Limak.Application.DTOs.Common;
+using Limak.Application.DTOs.RepsonseDTOs;
 using Microsoft.AspNetCore.Diagnostics;
 using System.Net;
 

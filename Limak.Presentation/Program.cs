@@ -12,8 +12,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddApplicationServices();
 builder.Services.AddPersistenceServices(builder.Configuration);
 builder.Services.AddInfrastructureServices();
+builder.Services.AddJwtBearer(builder.Configuration);
 
-builder.Services.AddSwaggerGen();
+builder.Services.IdentitySwagger();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -24,6 +25,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.AddExceptionHandlerService();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

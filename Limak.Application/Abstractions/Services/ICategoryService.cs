@@ -1,4 +1,5 @@
 ﻿using Limak.Application.DTOs.CategoryDTOs;
+using Limak.Application.DTOs.RepsonseDTOs;
 
 namespace Limak.Application.Abstractions.Services;
 
@@ -6,8 +7,8 @@ public interface ICategoryService
 {
     Task<List<CategoryGetDto>> GetAllAsync();
     Task<CategoryGetDto> GetByIdAsync(int id);
-    Task CreateAsync(CategoryPostDto dto);
-    Task UpdateAsync(CategoryPutDto dto);
+    Task<ResultDto> CreateAsync(CategoryPostDto dto);
+    Task<ResultDto> UpdateAsync(CategoryPutDto dto);
     Task<bool> IsExist(int id);
-    Task DeleteAsync(int id);
+    Task<ResultDto> DeleteAsync(int id);
 }

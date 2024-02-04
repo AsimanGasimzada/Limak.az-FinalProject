@@ -1,5 +1,4 @@
 ﻿using Limak.Domain.Entities;
-using Limak.Domain.Entities.Common;
 using Limak.Persistence.Interceptors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -38,6 +37,9 @@ public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int>
     public DbSet<Warehouse> Warehouses { get; set; }
     public DbSet<Kargomat> Kargomats { get; set; }
     public DbSet<DeliveryArea> DeliveryAreas { get; set; }
+    public DbSet<Gender> Genders { get; set; }
+    public DbSet<Citizenship> Citizenships { get; set; }
+    public DbSet<UserPosition> UserPositions { get; set; }
 
 
 

@@ -86,3 +86,5 @@ C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\FluentValid
 C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\FluentValidation.AspNetCore.dll
 C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\FluentValidation.DependencyInjectionExtensions.dll
 C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\Newtonsoft.Json.dll
+C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\Microsoft.IdentityModel.Abstractions.dll

@@ -7,6 +7,8 @@ public class Shop:BaseAuditableEntity
     public string Name { get; set; }
     public string ImagePath { get; set; }
     public string WebsitePath { get; set; }
+    public Country Country { get; set; }
+    public int CountryId { get; set; }
     public ICollection<ShopCategory> ShopCategories { get; set; }
 
     public ICollection<Order> Orders { get; set; }

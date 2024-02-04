@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace Limak.Application.DTOs.Common;
-public class ResultDto :  IResult
+namespace Limak.Application.DTOs.RepsonseDTOs;
+public class ResultDto : IResult
 {
     public ResultDto(string message)
     {
@@ -22,7 +22,7 @@ public class ResultDto :  IResult
     public ResultDto(int statusCode, string message)
     {
         this.statusCode = statusCode;
-        this.message = (string)message;
+        this.message = message;
     }
 
     public int? statusCode { get; init; } = 200;

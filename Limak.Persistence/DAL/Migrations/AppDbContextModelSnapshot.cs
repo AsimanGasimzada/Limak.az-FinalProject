@@ -41,6 +41,9 @@ namespace Limak.Persistence.DAL.Migrations
                     b.Property<DateTime>("Birtday")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("CitizenshipId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -58,10 +61,8 @@ namespace Limak.Persistence.DAL.Migrations
                         .HasColumnType("nchar(7)")
                         .IsFixedLength();
 
-                    b.Property<string>("Gender")
-                        .IsRequired()
-                        .HasMaxLength(16)
-                        .HasColumnType("nvarchar(16)");
+                    b.Property<int>("GenderId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Location")
                         .IsRequired()
@@ -96,6 +97,12 @@ namespace Limak.Persistence.DAL.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RefreshTokenExpiredAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -126,10 +133,20 @@ namespace Limak.Persistence.DAL.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<int>("UserPositionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CitizenshipId");
 
                     b.HasIndex("FinCode")
                         .IsUnique();
+
+                    b.HasIndex("GenderId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -141,6 +158,10 @@ namespace Limak.Persistence.DAL.Migrations
 
                     b.HasIndex("SeriaNumber")
                         .IsUnique();
+
+                    b.HasIndex("UserPositionId");
+
+                    b.HasIndex("WarehouseId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -182,6 +203,24 @@ namespace Limak.Persistence.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("Limak.Domain.Entities.Citizenship", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Citizenships");
                 });
 
             modelBuilder.Entity("Limak.Domain.Entities.Country", b =>
@@ -326,6 +365,24 @@ namespace Limak.Persistence.DAL.Migrations
                     b.HasIndex("WarehouseId");
 
                     b.ToTable("DeliveryAreas");
+                });
+
+            modelBuilder.Entity("Limak.Domain.Entities.Gender", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Genders");
                 });
 
             modelBuilder.Entity("Limak.Domain.Entities.Kargomat", b =>
@@ -503,6 +560,9 @@ namespace Limak.Persistence.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("CountryId")
+                        .HasColumnType("int");
+
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -534,6 +594,8 @@ namespace Limak.Persistence.DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CountryId");
 
                     b.ToTable("Shops");
                 });
@@ -580,6 +642,24 @@ namespace Limak.Persistence.DAL.Migrations
                         .IsUnique();
 
                     b.ToTable("Statuses");
+                });
+
+            modelBuilder.Entity("Limak.Domain.Entities.UserPosition", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserPositions");
                 });
 
             modelBuilder.Entity("Limak.Domain.Entities.Warehouse", b =>
@@ -776,6 +856,41 @@ namespace Limak.Persistence.DAL.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Limak.Domain.Entities.AppUser", b =>
+                {
+                    b.HasOne("Limak.Domain.Entities.Citizenship", "Citizenship")
+                        .WithMany()
+                        .HasForeignKey("CitizenshipId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Limak.Domain.Entities.Gender", "Gender")
+                        .WithMany()
+                        .HasForeignKey("GenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Limak.Domain.Entities.UserPosition", "UserPosition")
+                        .WithMany()
+                        .HasForeignKey("UserPositionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Limak.Domain.Entities.Warehouse", "Warehouse")
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Citizenship");
+
+                    b.Navigation("Gender");
+
+                    b.Navigation("UserPosition");
+
+                    b.Navigation("Warehouse");
+                });
+
             modelBuilder.Entity("Limak.Domain.Entities.Delivery", b =>
                 {
                     b.HasOne("Limak.Domain.Entities.DeliveryArea", "DeliveryArea")
@@ -849,6 +964,17 @@ namespace Limak.Persistence.DAL.Migrations
                     b.Navigation("Status");
 
                     b.Navigation("Warehouse");
+                });
+
+            modelBuilder.Entity("Limak.Domain.Entities.Shop", b =>
+                {
+                    b.HasOne("Limak.Domain.Entities.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Country");
                 });
 
             modelBuilder.Entity("Limak.Domain.Entities.ShopCategory", b =>

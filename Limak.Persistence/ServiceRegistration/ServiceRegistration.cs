@@ -6,6 +6,7 @@ using Limak.Persistence.Implementations.Repositories;
 using Limak.Persistence.Implementations.Services;
 using Limak.Persistence.Interceptors;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,6 +53,7 @@ public static class ServiceRegistration
             opt.Lockout.AllowedForNewUsers = false;
             opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
             opt.Lockout.MaxFailedAccessAttempts = 3;
+            
         }).AddDefaultTokenProviders().AddEntityFrameworkStores<AppDbContext>();
     }
 
@@ -60,7 +62,8 @@ public static class ServiceRegistration
         services.AddScoped<IShopService, ShopService>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IShopCategoryService, ShopCategoryService>();
-
+        services.AddScoped<ICountryService, CountryService>();
+        services.AddScoped<IAuthService, AuthService>();
     }
 
     private static void AddRepositories(IServiceCollection services)
@@ -68,6 +71,7 @@ public static class ServiceRegistration
         services.AddScoped<IShopRepository, ShopRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IShopCategoryRepository, ShopCategoryRepository>();
+        services.AddScoped<ICountryRepository, CountryRepository>();
     }
     #endregion
 }

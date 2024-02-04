@@ -10,5 +10,7 @@ public class ShopPutDtoValidator : AbstractValidator<ShopPutDto>
         RuleFor(x => x.Name).MaximumLength(256).MinimumLength(1).NotNull();
         RuleFor(x => x.WebsitePath).NotNull().MaximumLength(512).MinimumLength(1);
         RuleFor(x=>x.CategoryIds).NotNull();
+        RuleFor(x=>x.CountryId).NotNull();
+
     }
 }
