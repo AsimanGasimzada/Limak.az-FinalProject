@@ -38,7 +38,7 @@ public class AuthService : IAuthService
         var result = await _userManager.CreateAsync(user, dto.Password);
         if (!result.Succeeded)
             throw new InvalidInputException(string.Join(" ", result.Errors.Select(e => e.Description)));
-        await _userManager.AddToRoleAsync(user, IdentityRoles.Admin.ToString());
+        await _userManager.AddToRoleAsync(user, IdentityRoles.Member.ToString());
         List<Claim> Claims = await ClaimsCreateAsync(user);
 
         await _userManager.AddClaimsAsync(user, Claims);

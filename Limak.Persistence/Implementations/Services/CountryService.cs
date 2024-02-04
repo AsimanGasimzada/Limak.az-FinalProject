@@ -92,7 +92,7 @@ public class CountryService : ICountryService
     {
         var country = await _repository.GetSingleAsync(x => x.Id == id);
         if (country is null)
-            throw new NotFoundException($"Category is not found({id})!");
+            throw new NotFoundException($"Country is not found({id})!");
         return country;
     }
 

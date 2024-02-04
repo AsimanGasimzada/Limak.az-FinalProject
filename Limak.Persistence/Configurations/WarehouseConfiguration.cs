@@ -12,7 +12,7 @@ public class WarehouseConfiguration : IEntityTypeConfiguration<Warehouse>
         builder.HasIndex(x => x.Name).IsUnique();
         builder.Property(x => x.Location).IsRequired().HasMaxLength(128);
         builder.Property(x => x.Position).IsRequired().HasMaxLength(128);
-        builder.Property(x => x.PhoneNumber).IsRequired();
+        builder.Property(x => x.PhoneNumber).IsRequired().HasMaxLength(128);
         builder.Property(x => x.Email).IsRequired().HasMaxLength(256);
         builder.Property(x => x.WorkingHours).IsRequired().HasMaxLength(256);
     }
