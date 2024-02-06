@@ -221,6 +221,18 @@ namespace Limak.Persistence.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Citizenships");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Azərbaycanlı"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Digər"
+                        });
                 });
 
             modelBuilder.Entity("Limak.Domain.Entities.Country", b =>
@@ -230,23 +242,6 @@ namespace Limak.Persistence.DAL.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ModifiedTime")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -259,6 +254,18 @@ namespace Limak.Persistence.DAL.Migrations
                         .IsUnique();
 
                     b.ToTable("Countries");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Türkiyə"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Amerika"
+                        });
                 });
 
             modelBuilder.Entity("Limak.Domain.Entities.Delivery", b =>
@@ -440,7 +447,6 @@ namespace Limak.Persistence.DAL.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("AdditionFeesNotes")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -479,6 +485,9 @@ namespace Limak.Persistence.DAL.Migrations
 
                     b.Property<int?>("DeliveryId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsCancel")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -642,6 +651,63 @@ namespace Limak.Persistence.DAL.Migrations
                         .IsUnique();
 
                     b.ToTable("Statuses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Ödəniş olunub"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Sifariş edilib"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Sifariş edilməyib"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Xarici anbardadır"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Gömürükdədir"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Yoldadır"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Yerli anbardadır"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "Kuryer sifarişi çatdırır"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Name = "Kargomatdadır"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Name = "Təhvil verilib"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Name = "Ləğv edilib"
+                        });
                 });
 
             modelBuilder.Entity("Limak.Domain.Entities.UserPosition", b =>
@@ -660,6 +726,18 @@ namespace Limak.Persistence.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UserPositions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Fiziki şəxs"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Mülki şəxs"
+                        });
                 });
 
             modelBuilder.Entity("Limak.Domain.Entities.Warehouse", b =>

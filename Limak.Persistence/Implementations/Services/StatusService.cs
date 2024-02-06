@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Limak.Persistence.Implementations.Services;
 
-public class StatusService:IStatusService
+public class StatusService : IStatusService
 {
     private readonly IStatusRepository _repository;
     private readonly IMapper _mapper;
@@ -63,6 +63,15 @@ public class StatusService:IStatusService
         return dto;
     }
 
+    public async Task<StatusGetDto> GetByNameAsync(string name)
+    {
+        var status = await _repository.GetSingleAsync(x => x.Name == name);
+        if (status is null)
+            throw new NotFoundException($"{name}-This Status not found!");
+
+        var dto = _mapper.Map<StatusGetDto>(status);
+        return dto;
+    }
 
     public async Task<bool> IsExist(int id)
     {

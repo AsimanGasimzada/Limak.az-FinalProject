@@ -16,7 +16,8 @@ public class Order : BaseAuditableEntity
     public string Size { get; set; }
     public string Notes { get; set; }
     public decimal AdditionFees { get; set; } = 0;
-    public string AdditionFeesNotes { get; set; }
+    public string? AdditionFeesNotes { get; set; }
+    public bool IsCancel { get; set; } = false;
     //
     public int AppUserId { get; set; }
     public AppUser AppUser { get; set; }

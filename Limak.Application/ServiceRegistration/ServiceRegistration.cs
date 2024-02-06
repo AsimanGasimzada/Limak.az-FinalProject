@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using FluentValidation.AspNetCore;
+﻿using FluentValidation.AspNetCore;
 using Limak.Application.Validators.ShopValidators;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;

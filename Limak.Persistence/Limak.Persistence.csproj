@@ -21,8 +21,4 @@
     <ProjectReference Include="..\Limak.Application\Limak.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Utilities\Exceptions\ShopExceptions\" />
-  </ItemGroup>
-
 </Project>

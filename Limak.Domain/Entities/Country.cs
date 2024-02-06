@@ -2,7 +2,7 @@
 
 namespace Limak.Domain.Entities;
 
-public class Country:BaseAuditableEntity
+public class Country:BaseEntity
 {
     public string Name { get; set; }
 

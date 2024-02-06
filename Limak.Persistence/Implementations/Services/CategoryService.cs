@@ -5,6 +5,7 @@ using Limak.Application.DTOs.CategoryDTOs;
 using Limak.Application.DTOs.RepsonseDTOs;
 using Limak.Domain.Entities;
 using Limak.Persistence.Utilities.Exceptions.Common;
+using Limak.Persistence.Utilities.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Limak.Persistence.Implementations.Services;
@@ -13,13 +14,14 @@ public class CategoryService : ICategoryService
 {
     private readonly ICategoryRepository _repository;
     private readonly IMapper _mapper;
+    private readonly ICloudinaryService _cloudinaryService;
 
 
-
-    public CategoryService(ICategoryRepository repository, IMapper mapper)
+    public CategoryService(ICategoryRepository repository, IMapper mapper, ICloudinaryService cloudinaryService)
     {
         _repository = repository;
         _mapper = mapper;
+        _cloudinaryService = cloudinaryService;
     }
 
     public async Task<ResultDto> CreateAsync(CategoryPostDto dto)
@@ -27,8 +29,10 @@ public class CategoryService : ICategoryService
         var isExist = await _repository.IsExistAsync(x => x.Name.ToLower() == dto.Name.ToLower().Trim());
         if (isExist)
             throw new AlreadyExistException($"This category is already exist({dto.Name})!");
+        dto.Image.ValidateImage(2);
 
         var category = _mapper.Map<Category>(dto);
+        category.ImagePath = await _cloudinaryService.FileCreateAsync(dto.Image);
 
         await _repository.CreateAsync(category);
         await _repository.SaveAsync();
@@ -42,6 +46,8 @@ public class CategoryService : ICategoryService
 
         _repository.HardDelete(category);
         await _repository.SaveAsync();
+        await _cloudinaryService.FileDeleteAsync(category.ImagePath);
+
         return new($"{category.Name}-Category is successfully deleted");
 
     }
@@ -72,10 +78,17 @@ public class CategoryService : ICategoryService
         var isExist = await _repository.IsExistAsync(x => x.Name.ToLower() == dto.Name.ToLower().Trim() && x.Id != dto.Id);
         if (isExist)
             throw new AlreadyExistException($"{dto.Name}-This Category is already exist!");
+
         existedCategory = _mapper.Map(dto, existedCategory);
+        if (dto.Image is not null)
+        {
+            dto.Image.ValidateImage();
+            await _cloudinaryService.FileDeleteAsync(existedCategory.ImagePath);
+            existedCategory.ImagePath = await _cloudinaryService.FileCreateAsync(dto.Image);
+        }
         _repository.Update(existedCategory);
         await _repository.SaveAsync();
-        return new($"{existedCategory.Name}-Category is successfully created");
+        return new($"{existedCategory.Name}-Category is successfully updated");
     }
 
     private async Task<Category> _getCategory(int id)

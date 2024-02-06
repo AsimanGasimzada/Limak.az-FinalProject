@@ -11,4 +11,5 @@ public interface IStatusService
     Task<ResultDto> UpdateAsync(StatusPutDto dto);
     Task<bool> IsExist(int id);
     Task<ResultDto> DeleteAsync(int id);
+    Task<StatusGetDto> GetByNameAsync(string name);
 }

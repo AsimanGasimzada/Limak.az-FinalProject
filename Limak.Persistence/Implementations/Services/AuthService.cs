@@ -33,15 +33,26 @@ public class AuthService : IAuthService
 
     public async Task<AccessToken> RegisterAsync(RegisterDto dto)
     {
+        var isExistSerialNumber = await _userManager.Users.AnyAsync(x => x.SeriaNumber == dto.SeriaNumber);
+        if (isExistSerialNumber)
+            throw new ConflictException("This Serial Number also exists in the user");
+
+        var isExistFincode = await _userManager.Users.AnyAsync(x => x.FinCode == dto.FinCode);
+        if (isExistFincode)
+            throw new ConflictException("This Fincode also exists in the user");
+
         var user = _mapper.Map<AppUser>(dto);
         user.UserName = Guid.NewGuid().ToString().Substring(0, 6).ToUpper();
         var result = await _userManager.CreateAsync(user, dto.Password);
         if (!result.Succeeded)
             throw new InvalidInputException(string.Join(" ", result.Errors.Select(e => e.Description)));
+
         await _userManager.AddToRoleAsync(user, IdentityRoles.Member.ToString());
+
         List<Claim> Claims = await ClaimsCreateAsync(user);
 
         await _userManager.AddClaimsAsync(user, Claims);
+
         var accessToken = _tokenHelper.CreateToken(Claims);
         user.RefreshToken = accessToken.RefreshToken;
         user.RefreshTokenExpiredAt = accessToken.RefreshTokenExpiredAt;
@@ -128,7 +139,7 @@ public class AuthService : IAuthService
         return accessToken;
     }
 
-    
+
 
     public async Task<AccessToken> ChangePasswordAsync(ChangePasswordDto dto)
     {
@@ -143,7 +154,7 @@ public class AuthService : IAuthService
         if (!result.Succeeded)
             throw new InvalidInputException(string.Join(" ", result.Errors.Select(e => e.Description)));
 
-        var accessToken=await CreateAccessToken(user);
+        var accessToken = await CreateAccessToken(user);
 
         return accessToken;
     }

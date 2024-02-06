@@ -69,6 +69,8 @@ public static class ServiceRegistration
         services.AddScoped<IStatusService, StatusService>();
         services.AddScoped<IWarehouseService,WarehouseService>();
         services.AddScoped<IKargomatService, KargomatService>();
+        services.AddScoped<IDeliveryAreaService, DeliveryAreaService>();
+        services.AddScoped<IOrderService, OrderService>();
 
     }
 
@@ -84,6 +86,9 @@ public static class ServiceRegistration
         services.AddScoped<IStatusRepository, StatusRepository>();
         services.AddScoped<IWarehouseRepository,WarehouseRepository>();
         services.AddScoped<IKargomatRepository,KargomatRepository>();
+        services.AddScoped<IDeliveryAreaRepository, DeliveryAreaRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
+
 
     }
     #endregion

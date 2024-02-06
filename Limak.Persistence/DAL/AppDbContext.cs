@@ -1,5 +1,7 @@
 ﻿using Limak.Domain.Entities;
+using Limak.Domain.Enums;
 using Limak.Persistence.Interceptors;
+using Limak.Persistence.Utilities.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +19,7 @@ public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        builder.AddSeedData();
         base.OnModelCreating(builder);
     }
 
