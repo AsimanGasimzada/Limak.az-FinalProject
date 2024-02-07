@@ -71,6 +71,8 @@ public static class ServiceRegistration
         services.AddScoped<IKargomatService, KargomatService>();
         services.AddScoped<IDeliveryAreaService, DeliveryAreaService>();
         services.AddScoped<IOrderService, OrderService>();
+        services.AddScoped<ICompanyService, CompanyService>();
+        services.AddScoped<ITransactionService, TransactionService>();
 
     }
 
@@ -88,6 +90,7 @@ public static class ServiceRegistration
         services.AddScoped<IKargomatRepository,KargomatRepository>();
         services.AddScoped<IDeliveryAreaRepository, DeliveryAreaRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<ICompanyRepository, CompanyRepository>();
 
 
     }

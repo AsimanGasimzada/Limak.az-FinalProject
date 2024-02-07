@@ -8,6 +8,7 @@ public static class DbContextSeedData
 {
     public static void AddSeedData(this ModelBuilder builder)
     {
+        InitCompany(builder);
         AddStatuses(builder);
         AddCountries(builder);
         AddUserPositions(builder);
@@ -15,11 +16,18 @@ public static class DbContextSeedData
 
     }
 
+    private static void InitCompany(ModelBuilder builder)
+    {
+        builder.Entity<Company>().HasData(
+          new Company { Id = 1, TRYBalance = 0, AZNBalance = 0, USDBalance = 0 }
+          );
+    }
+
     private static void AddCountries(ModelBuilder builder)
     {
         builder.Entity<Country>().HasData(
-          new Country { Id = 1, Name = CountryNames.Turkey},
-          new Country { Id = 2, Name = CountryNames.America}
+          new Country { Id = 1, Name = CountryNames.Turkey },
+          new Country { Id = 2, Name = CountryNames.America }
           );
     }
 

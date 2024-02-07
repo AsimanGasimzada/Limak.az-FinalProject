@@ -235,6 +235,37 @@ namespace Limak.Persistence.DAL.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Limak.Domain.Entities.Company", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<decimal>("AZNBalance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TRYBalance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("USDBalance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Company");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AZNBalance = 0m,
+                            TRYBalance = 0m,
+                            USDBalance = 0m
+                        });
+                });
+
             modelBuilder.Entity("Limak.Domain.Entities.Country", b =>
                 {
                     b.Property<int>("Id")
@@ -535,6 +566,9 @@ namespace Limak.Persistence.DAL.Migrations
 
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("WarehouseId")
                         .HasColumnType("int");

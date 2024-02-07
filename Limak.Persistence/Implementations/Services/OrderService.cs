@@ -23,7 +23,8 @@ public class OrderService : IOrderService
     private readonly ICountryService _countryService;
     private readonly IWarehouseService _warehouseService;
     private readonly IStatusService _statusService;
-    public OrderService(IOrderRepository repository, IMapper mapper, IHttpContextAccessor contextAccessor, UserManager<AppUser> userManager, ICountryService countryService, IWarehouseService warehouseService, IStatusService statusService)
+    private readonly ITransactionService _transactionService;
+    public OrderService(IOrderRepository repository, IMapper mapper, IHttpContextAccessor contextAccessor, UserManager<AppUser> userManager, ICountryService countryService, IWarehouseService warehouseService, IStatusService statusService, ITransactionService transactionService)
     {
         _repository = repository;
         _mapper = mapper;
@@ -32,6 +33,7 @@ public class OrderService : IOrderService
         _countryService = countryService;
         _warehouseService = warehouseService;
         _statusService = statusService;
+        _transactionService = transactionService;
     }
 
     public async Task<ResultDto> CreateAsync(OrderPostDto dto)
@@ -46,6 +48,8 @@ public class OrderService : IOrderService
             throw new NotFoundException($"{dto.WarehouseId}-This Warehouse is not found!");
 
         var order = _mapper.Map<Order>(dto);
+        order.TotalPrice = (decimal)(order.Price * order.Count) + order.LocalCargoPrice;
+        order.TotalPrice = order.TotalPrice * 1.05m;
         order.AppUser = user;
         order.StatusId = (await _statusService.GetByNameAsync(StatusNames.NotOrdered)).Id;
 
@@ -114,6 +118,37 @@ public class OrderService : IOrderService
 
     }
 
+    public async Task<ResultDto> PayOrders(List<int> orderIds)
+    {
+        var user = await GetUser();
+        List<Order> orders = new List<Order>();
+        orderIds.ForEach(x => orders.Add(_getOrder(x).Result));
+        var country = orders.FirstOrDefault().Country;
+
+        orders.ForEach(x => { if (x.AppUser != user || x.Country != country || x.Status.Name != StatusNames.NotOrdered) throw new InvalidInputException($"{x.Id}-This Order not found"); });
+
+        decimal totalPrice = 0;
+        orders.ForEach(x => totalPrice += x.TotalPrice);
+
+        if (country.Name == CountryNames.Turkey)
+            await _transactionService.PaymentByTRYBalance(new() { Amount = totalPrice });
+
+        if (country.Name == CountryNames.America)
+            await _transactionService.PaymentByUSDBalance(new() { Amount = totalPrice });
+
+        var paidStatus=await _statusService.GetByNameAsync(StatusNames.Paid);
+
+        orders.ForEach(x =>
+        {
+            x.StatusId = paidStatus.Id;
+            _repository.Update(x);
+        });
+
+        await _repository.SaveAsync();
+
+        return new($"Payment is successfully Total-{totalPrice}");
+    }
+
     public async Task<ResultDto> UpdateAsync(OrderPutDto dto)
     {
         var order = await _getOrder(dto.Id);
@@ -145,7 +180,7 @@ public class OrderService : IOrderService
     }
     private async Task<Order> _getOrder(int id)
     {
-        var order = await _repository.GetSingleAsync(x => x.Id == id, false, "Status", "AppUser");
+        var order = await _repository.GetSingleAsync(x => x.Id == id, false, "Status", "AppUser", "Country");
         if (order is null)
             throw new NotFoundException($"{id}-This order is not found");
         return order;

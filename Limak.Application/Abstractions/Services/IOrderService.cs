@@ -12,4 +12,5 @@ public interface IOrderService
     Task<ResultDto> UpdateAsync(OrderPutDto dto);
     Task<bool> IsExist(int id);
     Task<ResultDto> DeleteAsync(int id);
+    Task<ResultDto> PayOrders(List<int> orderIds);
 }

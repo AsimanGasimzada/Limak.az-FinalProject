@@ -30,6 +30,7 @@ public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int>
     }
 
 
+    public DbSet<Company> Company { get; set; } //only one data
     public DbSet<Shop> Shops { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<ShopCategory> ShopCategories { get; set; }

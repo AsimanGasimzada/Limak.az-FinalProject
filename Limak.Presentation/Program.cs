@@ -24,7 +24,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-//app.AddExceptionHandlerService();
+app.AddExceptionHandlerService();
 app.UseAuthentication();
 app.UseAuthorization();
 
