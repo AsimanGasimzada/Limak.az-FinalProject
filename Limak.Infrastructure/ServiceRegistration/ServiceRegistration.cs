@@ -16,6 +16,8 @@ public static class ServiceRegistration
     {
         services.AddScoped<ICloudinaryService, CloudinaryService>();
         services.AddScoped<ITokenHelper, JWTHelper>();
+        services.AddScoped<IEmailHelper, MailKitHelper>();
+
         return services;
     }
     public static IServiceCollection AddJwtBearer(this IServiceCollection services, IConfiguration configuration)

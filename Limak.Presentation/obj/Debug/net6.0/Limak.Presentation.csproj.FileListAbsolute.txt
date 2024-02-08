@@ -89,3 +89,11 @@ C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\runtimes\un
 C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Drawing.Common.dll
 C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
+C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\BouncyCastle.Cryptography.dll
+C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\MailKit.dll
+C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\MimeKit.dll
+C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\System.Formats.Asn1.dll
+C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\System.Text.Encoding.CodePages.dll
+C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\DELL\source\repos\Limak\Limak.Presentation\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Text.Encoding.CodePages.dll

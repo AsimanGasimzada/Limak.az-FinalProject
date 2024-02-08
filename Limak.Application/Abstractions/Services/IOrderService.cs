@@ -6,6 +6,8 @@ namespace Limak.Application.Abstractions.Services;
 public interface IOrderService
 {
     Task<List<OrderGetDto>> GetAllAsync();
+    Task<List<OrderGetDto>> GetNotPaymentOrders();
+    Task<List<OrderGetDto>> GetUserAllOrders();
 
     Task<OrderGetDto> GetByIdAsync(int id);
     Task<ResultDto> CreateAsync(OrderPostDto dto);

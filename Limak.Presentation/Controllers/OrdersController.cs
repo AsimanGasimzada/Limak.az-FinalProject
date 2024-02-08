@@ -25,6 +25,22 @@ public class OrdersController : ControllerBase
         return Ok(await _service.GetAllAsync());
     }
 
+    [HttpGet("[action]")]
+    [Authorize(Roles = "Member")]
+    public async Task<IActionResult> GetAllAsync()
+    {
+        return Ok(await _service.GetUserAllOrders());
+    }
+
+
+    [HttpGet("[action]")]
+    [Authorize(Roles = "Member")]
+    public async Task<IActionResult> GetNotPaymeyntOrders()
+    {
+        return Ok(await _service.GetNotPaymentOrders());
+    }
+
+
     [HttpPost("[action]")]
     [Authorize(Roles ="Member")]
     public async Task<IActionResult> PayOrders([FromForm]List<int> orderIds)

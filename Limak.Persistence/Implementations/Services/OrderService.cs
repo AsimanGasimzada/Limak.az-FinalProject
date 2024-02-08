@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Limak.Application.Abstractions.Helpers;
 using Limak.Application.Abstractions.Repositories;
 using Limak.Application.Abstractions.Services;
 using Limak.Application.DTOs.OrderDTOs;
@@ -24,7 +25,8 @@ public class OrderService : IOrderService
     private readonly IWarehouseService _warehouseService;
     private readonly IStatusService _statusService;
     private readonly ITransactionService _transactionService;
-    public OrderService(IOrderRepository repository, IMapper mapper, IHttpContextAccessor contextAccessor, UserManager<AppUser> userManager, ICountryService countryService, IWarehouseService warehouseService, IStatusService statusService, ITransactionService transactionService)
+    private readonly IEmailHelper _emailHelper;
+    public OrderService(IOrderRepository repository, IMapper mapper, IHttpContextAccessor contextAccessor, UserManager<AppUser> userManager, ICountryService countryService, IWarehouseService warehouseService, IStatusService statusService, ITransactionService transactionService, IEmailHelper emailHelper)
     {
         _repository = repository;
         _mapper = mapper;
@@ -34,6 +36,7 @@ public class OrderService : IOrderService
         _warehouseService = warehouseService;
         _statusService = statusService;
         _transactionService = transactionService;
+        _emailHelper = emailHelper;
     }
 
     public async Task<ResultDto> CreateAsync(OrderPostDto dto)
@@ -106,6 +109,28 @@ public class OrderService : IOrderService
 
     }
 
+    public async Task<List<OrderGetDto>> GetNotPaymentOrders()
+    {
+        var user = await GetUser();
+        var orders=await _repository.GetFiltered(x=>x.AppUser== user && x.Status.Name==StatusNames.NotOrdered,false,"AppUser","Status","Country").ToListAsync();
+        if (orders.Count is 0)
+            throw new NotFoundException("Order is not found!");
+
+        var dtos=_mapper.Map<List<OrderGetDto>>(orders);
+        return dtos;
+    }
+
+    public async Task<List<OrderGetDto>> GetUserAllOrders()
+    {
+        var user =await GetUser();
+        var orders = await _repository.GetFiltered(x => x.AppUser == user, false, "AppUser", "Status", "Country").ToListAsync();
+        if (orders.Count is 0)
+            throw new NotFoundException("Order is not found!");
+
+        var dtos = _mapper.Map<List<OrderGetDto>>(orders);
+        return dtos;
+    }
+
     public async Task<bool> IsExist(int id)
     {
         var order = await _repository.GetSingleAsync(x => x.Id == id, false, "AppUser");
@@ -117,26 +142,25 @@ public class OrderService : IOrderService
         return (order.AppUser == currentUser);
 
     }
-
     public async Task<ResultDto> PayOrders(List<int> orderIds)
     {
         var user = await GetUser();
         List<Order> orders = new List<Order>();
         orderIds.ForEach(x => orders.Add(_getOrder(x).Result));
-        var country = orders.FirstOrDefault().Country;
+        var country = orders.FirstOrDefault()?.Country;
 
         orders.ForEach(x => { if (x.AppUser != user || x.Country != country || x.Status.Name != StatusNames.NotOrdered) throw new InvalidInputException($"{x.Id}-This Order not found"); });
 
         decimal totalPrice = 0;
         orders.ForEach(x => totalPrice += x.TotalPrice);
 
-        if (country.Name == CountryNames.Turkey)
+        if (country?.Name == CountryNames.Turkey)
             await _transactionService.PaymentByTRYBalance(new() { Amount = totalPrice });
 
-        if (country.Name == CountryNames.America)
+        if (country?.Name == CountryNames.America)
             await _transactionService.PaymentByUSDBalance(new() { Amount = totalPrice });
 
-        var paidStatus=await _statusService.GetByNameAsync(StatusNames.Paid);
+        var paidStatus = await _statusService.GetByNameAsync(StatusNames.Paid);
 
         orders.ForEach(x =>
         {
@@ -172,7 +196,7 @@ public class OrderService : IOrderService
 
     private async Task<AppUser> GetUser()
     {
-        var id = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var id = _contextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
         var user = await _userManager.FindByIdAsync(id);
         if (user is null)
             throw new UnAuthorizedException();

@@ -22,13 +22,15 @@ public class AuthService : IAuthService
     private readonly ITokenHelper _tokenHelper;
     private readonly IMapper _mapper;
     private readonly IHttpContextAccessor _accessor;
-    public AuthService(UserManager<AppUser> userManager, IMapper mapper, RoleManager<IdentityRole<int>> roleManager, ITokenHelper tokenHelper, IHttpContextAccessor accessor)
+    private readonly IEmailHelper _emailHelper;
+    public AuthService(UserManager<AppUser> userManager, IMapper mapper, RoleManager<IdentityRole<int>> roleManager, ITokenHelper tokenHelper, IHttpContextAccessor accessor, IEmailHelper emailHelper)
     {
         _userManager = userManager;
         _mapper = mapper;
         _roleManager = roleManager;
         _tokenHelper = tokenHelper;
         _accessor = accessor;
+        _emailHelper = emailHelper;
     }
 
     public async Task<AccessToken> RegisterAsync(RegisterDto dto)
@@ -57,6 +59,15 @@ public class AuthService : IAuthService
         user.RefreshToken = accessToken.RefreshToken;
         user.RefreshTokenExpiredAt = accessToken.RefreshTokenExpiredAt;
         await _userManager.UpdateAsync(user);
+
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        await _emailHelper.SendEmailAsync(new()
+        {
+            Subject = "Confirm Email",
+            Body = token,
+            ToEmail = user.Email
+        });
+
 
         return accessToken;
     }
@@ -166,5 +177,23 @@ public class AuthService : IAuthService
         user.RefreshTokenExpiredAt = accessToken.RefreshTokenExpiredAt;
         await _userManager.UpdateAsync(user);
         return accessToken;
+    }
+     
+    
+    public async Task<AccessToken> ConfirmEmailAsync(string token)
+    {
+        var id = _accessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var user = await _userManager.FindByIdAsync(id);
+        if (user is null)
+            throw new NotFoundException("User is not found!");
+
+
+        var result = await _userManager.ConfirmEmailAsync(user, token);
+        
+        if (!result.Succeeded)
+            throw new InvalidInputException(string.Join(" ", result.Errors.Select(e => e.Description)));
+
+
+        return await CreateAccessToken(user);
     }
 }
