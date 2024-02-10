@@ -2,8 +2,22 @@
 
 namespace Limak.Presentation.Extensions;
 
-public static class SwaggerConfiguration
+public static class ExtensionMethods
 {
+
+    public static IServiceCollection AddCorsConfig(this IServiceCollection services)
+    {
+
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowSpecificOrigin",
+                builder => builder.WithOrigins("http://localhost:3000")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials());
+        });
+        return services;
+    }
     public static IServiceCollection IdentitySwagger(this IServiceCollection services)
     {
 

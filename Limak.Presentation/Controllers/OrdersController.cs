@@ -18,13 +18,7 @@ public class OrdersController : ControllerBase
         _service = service;
     }
 
-    [HttpGet("[action]")]
-    [Authorize(Roles ="Admin")]
-    public async Task<IActionResult> GetAllAdminAsync()
-    {
-        return Ok(await _service.GetAllAsync());
-    }
-
+  
     [HttpGet("[action]")]
     [Authorize(Roles = "Member")]
     public async Task<IActionResult> GetAllAsync()
@@ -72,4 +66,26 @@ public class OrdersController : ControllerBase
 
         return Ok(await _service.UpdateAsync(dto));
     }
+
+
+
+
+    //Admin
+
+    [HttpGet("[action]")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetAllAdminAsync()
+    {
+        return Ok(await _service.GetAllAsync());
+    }
+
+    [HttpPut("[action]")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> PutOrderAdminAsync(OrderAdminPutDto dto)
+    {
+        return Ok(await _service.UpdateOrderByAdminAsync(dto));
+    }
+
+
+
 }

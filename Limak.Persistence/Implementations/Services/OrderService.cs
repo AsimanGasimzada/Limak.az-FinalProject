@@ -84,17 +84,6 @@ public class OrderService : IOrderService
 
 
 
-    public async Task<List<OrderGetDto>> GetAllAsync()
-    {
-        var orders = await _repository.GetAll(false, "AppUser", "Status", "Delivery", "Warehouse", "Kargomat", "Country").ToListAsync();
-
-        if (orders.Count is 0)
-            throw new NotFoundException("Order is not found!");
-
-        var dtos = _mapper.Map<List<OrderGetDto>>(orders);
-        return dtos;
-    }
-
     public async Task<OrderGetDto> GetByIdAsync(int id)
     {
         var order = await _getOrder(id);
@@ -112,17 +101,17 @@ public class OrderService : IOrderService
     public async Task<List<OrderGetDto>> GetNotPaymentOrders()
     {
         var user = await GetUser();
-        var orders=await _repository.GetFiltered(x=>x.AppUser== user && x.Status.Name==StatusNames.NotOrdered,false,"AppUser","Status","Country").ToListAsync();
+        var orders = await _repository.GetFiltered(x => x.AppUser == user && x.Status.Name == StatusNames.NotOrdered, false, "AppUser", "Status", "Country").ToListAsync();
         if (orders.Count is 0)
             throw new NotFoundException("Order is not found!");
 
-        var dtos=_mapper.Map<List<OrderGetDto>>(orders);
+        var dtos = _mapper.Map<List<OrderGetDto>>(orders);
         return dtos;
     }
 
     public async Task<List<OrderGetDto>> GetUserAllOrders()
     {
-        var user =await GetUser();
+        var user = await GetUser();
         var orders = await _repository.GetFiltered(x => x.AppUser == user, false, "AppUser", "Status", "Country").ToListAsync();
         if (orders.Count is 0)
             throw new NotFoundException("Order is not found!");
@@ -193,6 +182,75 @@ public class OrderService : IOrderService
         return new($"{order.Id}-Order is successfully updated");
     }
 
+
+
+    // Admin methods
+
+
+    public async Task<List<OrderGetDto>> GetAllAsync()
+    {
+        var orders = await _repository.GetAll(false, "AppUser", "Status", "Delivery", "Warehouse", "Kargomat", "Country").ToListAsync();
+
+        if (orders.Count is 0)
+            throw new NotFoundException("Order is not found!");
+
+        var dtos = _mapper.Map<List<OrderGetDto>>(orders);
+        return dtos;
+    }
+
+    public async Task<ResultDto> OrderCancelAsync(OrderCancelDto dto)
+    {
+        var order = await _getOrder(dto.Id);
+        order.IsCancel = true;
+        order.CancellationNotes = dto.CancellationNotes;
+        decimal amount = (order.Price * order.Count) + order.LocalCargoPrice;
+        if (order.Country.Name == CountryNames.Turkey)
+            await _transactionService.IncreaseTRYBalanceAdmin(new() { AppUserId = order.AppUserId, Amount = amount });
+
+        if (order.Country.Name == CountryNames.America)
+            await _transactionService.IncreaseUSDBalanceAdmin(new() { AppUserId = order.AppUserId, Amount = amount });
+
+        _repository.Update(order);
+        await _repository.SaveAsync();
+
+        return new($"{order.Id}-Order is canceled");
+
+    }
+
+
+    public async Task<ResultDto> UpdateOrderByAdminAsync(OrderAdminPutDto dto)
+    {
+        var existed = await _getOrder(dto.Id);
+
+        existed = _mapper.Map(dto, existed);
+
+        existed.TotalPrice = (decimal)(existed.Price * existed.Count) + existed.LocalCargoPrice + existed.AdditionFees;
+        existed.TotalPrice = existed.TotalPrice * 1.05m;
+        existed.StatusId = (await _statusService.GetByNameAsync(StatusNames.Ordered)).Id;
+
+
+        _repository.Update(existed);
+        await _repository.SaveAsync();
+
+        return new($"{existed.Id}-Order successfully edited");
+    }
+
+
+    public async Task<ResultDto> ChangeOrderStatusAsync(OrderChangeStatusDto dto)
+    {
+        var order = await _getOrder(dto.Id);
+
+        var isExistStatus = await _statusService.IsExist(dto.StatusId);
+        if (!isExistStatus)
+            throw new InvalidInputException($"{dto.StatusId}-this status is not found");
+
+        order.StatusId = dto.StatusId;
+
+        _repository.Update(order);
+        await _repository.SaveAsync();
+
+        return new($"{order.Id}-Order is successfully updated");
+    }
 
     private async Task<AppUser> GetUser()
     {

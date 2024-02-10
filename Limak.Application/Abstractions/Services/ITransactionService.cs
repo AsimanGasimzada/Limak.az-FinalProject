@@ -11,7 +11,12 @@ public interface ITransactionService
     Task<ResultDto> PaymentByAZNBalance(BalancePutDto dto);
     Task<ResultDto> PaymentByTRYBalance(BalancePutDto dto);
     Task<ResultDto> PaymentByUSDBalance(BalancePutDto dto);
-    
     Task<GetBalanceDto> GetBalances();
+
+
+    Task<ResultDto> IncreaseAZNBalanceAdmin(BalanceAdminPutDto dto);
+    Task<ResultDto> IncreaseTRYBalanceAdmin(BalanceAdminPutDto dto);
+    Task<ResultDto> IncreaseUSDBalanceAdmin(BalanceAdminPutDto dto);
+
 
 }

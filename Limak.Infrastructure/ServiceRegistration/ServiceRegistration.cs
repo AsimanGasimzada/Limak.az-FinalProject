@@ -1,26 +1,41 @@
 ﻿using Limak.Application.Abstractions.Helpers;
 using Limak.Application.Abstractions.Services;
+using Limak.Application.DTOs.StripeDTOs;
 using Limak.Infrastructure.Implementations.Security.JWT;
 using Limak.Infrastructure.Implementations.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Stripe;
 using System.Text;
 
 namespace Limak.Infrastructure.ServiceRegistration;
 
 public static class ServiceRegistration
 {
-    public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
+    public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,IConfiguration configuration)
     {
+        AddJwtBearer(services, configuration);
+        AddStripe(services, configuration);
+
         services.AddScoped<ICloudinaryService, CloudinaryService>();
         services.AddScoped<ITokenHelper, JWTHelper>();
         services.AddScoped<IEmailHelper, MailKitHelper>();
+        services.AddScoped<IPaymentService, StripeService>();
+        services.AddScoped<StripeSettings>();
+
 
         return services;
     }
-    public static IServiceCollection AddJwtBearer(this IServiceCollection services, IConfiguration configuration)
+
+    private static void AddStripe(IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<StripeSettings>(configuration.GetSection("StripeOptions"));
+        StripeConfiguration.ApiKey = configuration["StripeOptions:SecretKey"];
+    }
+
+    private static void AddJwtBearer(IServiceCollection services, IConfiguration configuration)
     {
         services.AddAuthentication(opt =>
         {
@@ -44,8 +59,5 @@ public static class ServiceRegistration
 
             };
         });
-
-
-        return services;
     }
 }

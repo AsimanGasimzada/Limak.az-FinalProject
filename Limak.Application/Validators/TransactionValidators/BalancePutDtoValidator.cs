@@ -3,9 +3,9 @@ using Limak.Application.DTOs.TransactionDTOs;
 
 namespace Limak.Application.Validators.TransactionValidators;
 
-public class BalancaPutDtoValidator:AbstractValidator<BalancePutDto>
+public class BalancePutDtoValidator:AbstractValidator<BalancePutDto>
 {
-    public BalancaPutDtoValidator()
+    public BalancePutDtoValidator()
     {
         RuleFor(x=>x.Amount).NotEmpty().GreaterThanOrEqualTo(0);
     }

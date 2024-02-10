@@ -1,5 +1,6 @@
 ﻿using Limak.Application.Abstractions.Services;
 using Limak.Application.DTOs.AuthDTOs;
+using Limak.Application.DTOs.StripeDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,12 +11,20 @@ namespace Limak.Presentation.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _service;
-
-    public AuthController(IAuthService service)
+    private readonly IPaymentService _paymentService;
+    public AuthController(IAuthService service, IPaymentService paymentService)
     {
         _service = service;
+        _paymentService = paymentService;
     }
 
+
+
+    [HttpPost("[action]")]
+    public async Task<IActionResult> Pay(StripePayDto dto)
+    {
+        return Ok(await _paymentService.PayAsync(dto));
+    }
     [HttpPost("[action]")]
     public async Task<IActionResult> Register([FromBody] RegisterDto dto)
     {

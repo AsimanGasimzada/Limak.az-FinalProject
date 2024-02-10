@@ -11,9 +11,8 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddApplicationServices();
 builder.Services.AddPersistenceServices(builder.Configuration);
-builder.Services.AddInfrastructureServices();
-builder.Services.AddJwtBearer(builder.Configuration);
-
+builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddCorsConfig();
 builder.Services.IdentitySwagger();
 var app = builder.Build();
 
@@ -24,7 +23,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.AddExceptionHandlerService();
+app.UseCors("AllowSpecificOrigin");
+//app.AddExceptionHandlerService();
 app.UseAuthentication();
 app.UseAuthorization();
 
