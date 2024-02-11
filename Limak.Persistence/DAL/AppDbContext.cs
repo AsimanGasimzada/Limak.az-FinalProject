@@ -1,5 +1,4 @@
 ﻿using Limak.Domain.Entities;
-using Limak.Domain.Enums;
 using Limak.Persistence.Interceptors;
 using Limak.Persistence.Utilities.Helpers;
 using Microsoft.AspNetCore.Identity;
@@ -44,6 +43,7 @@ public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int>
     public DbSet<Gender> Genders { get; set; }
     public DbSet<Citizenship> Citizenships { get; set; }
     public DbSet<UserPosition> UserPositions { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
 
 
 

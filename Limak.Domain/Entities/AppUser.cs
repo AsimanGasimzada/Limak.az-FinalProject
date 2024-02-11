@@ -15,6 +15,7 @@ public class AppUser:IdentityUser<int>
     public decimal USDBalance { get; set; }
 
     public ICollection<Order> Orders { get; set; }
+    public ICollection<Notification> Notifications{ get; set; }
     public Gender Gender { get; set; }
     public int GenderId { get; set; }
 
@@ -27,4 +28,5 @@ public class AppUser:IdentityUser<int>
     public int WarehouseId { get; set; }
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpiredAt { get; set; }
+
 }

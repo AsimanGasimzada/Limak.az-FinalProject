@@ -26,7 +26,8 @@ public class OrderService : IOrderService
     private readonly IStatusService _statusService;
     private readonly ITransactionService _transactionService;
     private readonly IEmailHelper _emailHelper;
-    public OrderService(IOrderRepository repository, IMapper mapper, IHttpContextAccessor contextAccessor, UserManager<AppUser> userManager, ICountryService countryService, IWarehouseService warehouseService, IStatusService statusService, ITransactionService transactionService, IEmailHelper emailHelper)
+    private readonly INotificationService _notificationService;
+    public OrderService(IOrderRepository repository, IMapper mapper, IHttpContextAccessor contextAccessor, UserManager<AppUser> userManager, ICountryService countryService, IWarehouseService warehouseService, IStatusService statusService, ITransactionService transactionService, IEmailHelper emailHelper, INotificationService noNotificationService)
     {
         _repository = repository;
         _mapper = mapper;
@@ -37,6 +38,7 @@ public class OrderService : IOrderService
         _statusService = statusService;
         _transactionService = transactionService;
         _emailHelper = emailHelper;
+        _notificationService = noNotificationService;
     }
 
     public async Task<ResultDto> CreateAsync(OrderPostDto dto)
@@ -240,11 +242,17 @@ public class OrderService : IOrderService
     {
         var order = await _getOrder(dto.Id);
 
-        var isExistStatus = await _statusService.IsExist(dto.StatusId);
-        if (!isExistStatus)
+        var Status = await _statusService.GetByIdAsync(dto.StatusId);
+        if (Status is null)
             throw new InvalidInputException($"{dto.StatusId}-this status is not found");
 
         order.StatusId = dto.StatusId;
+
+
+        
+        await _notificationService.CreateAsync(new() { AppUserId = order.AppUserId, Subject = "Sifarişinizin statusu dəyişdi", Title = $"{order.Id}-nömrəli sifarişiniz {Status.Name}-mərhələsinə keçdi" });
+
+
 
         _repository.Update(order);
         await _repository.SaveAsync();
@@ -266,5 +274,28 @@ public class OrderService : IOrderService
         if (order is null)
             throw new NotFoundException($"{id}-This order is not found");
         return order;
+    }
+
+    public async Task<ResultDto> SetDelivery(List<int> orderIds, Delivery Delivery)
+    {
+        foreach (var orderId in orderIds)
+        {
+            var order = await _getOrder(orderId);
+            order.Delivery = Delivery;
+            _repository.Update(order);
+        }
+        return new("Delivery is successfully set");
+    }
+
+    public async Task<ResultDto> CancelDelivery(Delivery delivery)
+    {
+        var status =await _statusService.GetByNameAsync(StatusNames.LocalWarehouse);
+        foreach (var order in delivery.Orders)
+        {
+            order.StatusId = status.Id;
+            order.DeliveryId = null;
+            _repository.Update(order);
+        }
+        return new("Delivery is successfully canceled");
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Limak.Application.DTOs.OrderDTOs;
 using Limak.Application.DTOs.RepsonseDTOs;
+using Limak.Domain.Entities;
 
 namespace Limak.Application.Abstractions.Services;
 
@@ -18,4 +19,6 @@ public interface IOrderService
     Task<ResultDto> UpdateOrderByAdminAsync(OrderAdminPutDto dto);
     Task<ResultDto> OrderCancelAsync(OrderCancelDto dto);
     Task<ResultDto> ChangeOrderStatusAsync(OrderChangeStatusDto dto);
+    Task<ResultDto> SetDelivery(List<int> orderIds,Delivery Delivery);
+    Task<ResultDto> CancelDelivery(Delivery delivery);
 }

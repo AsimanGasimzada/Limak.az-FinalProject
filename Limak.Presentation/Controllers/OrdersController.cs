@@ -18,7 +18,7 @@ public class OrdersController : ControllerBase
         _service = service;
     }
 
-  
+
     [HttpGet("[action]")]
     [Authorize(Roles = "Member")]
     public async Task<IActionResult> GetAllAsync()
@@ -36,10 +36,10 @@ public class OrdersController : ControllerBase
 
 
     [HttpPost("[action]")]
-    [Authorize(Roles ="Member")]
-    public async Task<IActionResult> PayOrders([FromForm]List<int> orderIds)
+    [Authorize(Roles = "Member")]
+    public async Task<IActionResult> PayOrders([FromForm] List<int> orderIds)
     {
-        return Ok(await _service.PayOrders(orderIds));    
+        return Ok(await _service.PayOrders(orderIds));
     }
 
     [HttpGet("{id}")]
@@ -48,7 +48,7 @@ public class OrdersController : ControllerBase
         return Ok(await _service.GetByIdAsync(id));
     }
     [HttpPost]
-    public async Task<IActionResult> CreateAsync( OrderPostDto dto)
+    public async Task<IActionResult> CreateAsync(OrderPostDto dto)
     {
 
         return Ok(await _service.CreateAsync(dto));
@@ -85,6 +85,15 @@ public class OrdersController : ControllerBase
     {
         return Ok(await _service.UpdateOrderByAdminAsync(dto));
     }
+
+    [HttpPatch("[action]")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ChangeOrderStatusAsync(OrderChangeStatusDto dto)
+    {
+        return Ok(await _service.ChangeOrderStatusAsync(dto));
+    }
+
+
 
 
 

@@ -9,6 +9,7 @@ public class AuthAutoMapper:Profile
     public AuthAutoMapper()
     {
         CreateMap<AppUser, RegisterDto>().ReverseMap();
+        CreateMap<AppUser, AppUserGetDto>().ReverseMap();
 
     }
 }

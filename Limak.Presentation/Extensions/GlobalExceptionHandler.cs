@@ -22,6 +22,7 @@ public static class GlobalExceptionHandler
                     if (contextFeature.Error is IBaseException)
                     {
                         var error = contextFeature.Error;
+                        statusCode = 999;
                         message = error.Message;
 
                     }

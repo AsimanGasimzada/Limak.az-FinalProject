@@ -2,9 +2,11 @@
 using Limak.Application.Abstractions.Services;
 using Limak.Domain.Entities;
 using Limak.Persistence.DAL;
+using Limak.Persistence.Implementations.Hubs;
 using Limak.Persistence.Implementations.Repositories;
 using Limak.Persistence.Implementations.Services;
 using Limak.Persistence.Interceptors;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +18,7 @@ public static class ServiceRegistration
 {
     public static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
     {
-
+        services.AddSignalR();
         AddDbContext(services, configuration);
         AddIdentity(services);
         AddServices(services);
@@ -25,6 +27,13 @@ public static class ServiceRegistration
 
 
         return services;
+    }
+
+    public static WebApplication AddSignalREndpoints(this WebApplication app)
+    {
+        app.MapHub<NotificationHub>("/notificationhub");
+
+        return app;
     }
 
 
@@ -67,12 +76,14 @@ public static class ServiceRegistration
         services.AddScoped<IGenderService, GenderService>();
         services.AddScoped<IUserPositionService, UserPositionService>();
         services.AddScoped<IStatusService, StatusService>();
-        services.AddScoped<IWarehouseService,WarehouseService>();
+        services.AddScoped<IWarehouseService, WarehouseService>();
         services.AddScoped<IKargomatService, KargomatService>();
         services.AddScoped<IDeliveryAreaService, DeliveryAreaService>();
+        services.AddScoped<IDeliveryService, DeliveryService>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<ICompanyService, CompanyService>();
         services.AddScoped<ITransactionService, TransactionService>();
+        services.AddScoped<INotificationService, NotificationService>();
 
     }
 
@@ -86,11 +97,13 @@ public static class ServiceRegistration
         services.AddScoped<IGenderRepository, GenderRepository>();
         services.AddScoped<IUserPositionRepository, UserPositionRepository>();
         services.AddScoped<IStatusRepository, StatusRepository>();
-        services.AddScoped<IWarehouseRepository,WarehouseRepository>();
-        services.AddScoped<IKargomatRepository,KargomatRepository>();
+        services.AddScoped<IWarehouseRepository, WarehouseRepository>();
+        services.AddScoped<IKargomatRepository, KargomatRepository>();
         services.AddScoped<IDeliveryAreaRepository, DeliveryAreaRepository>();
+        services.AddScoped<IDeliveryRepository, DeliveryRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<ICompanyRepository, CompanyRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
 
 
     }

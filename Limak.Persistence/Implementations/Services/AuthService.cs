@@ -112,8 +112,8 @@ public class AuthService : IAuthService
             user.LockoutEnabled = false;
             user.AccessFailedCount = 0;
             user.LockoutEnd = null;
+            await _userManager.UpdateAsync(user);
         }
-        await _userManager.UpdateAsync(user);
         if (!result)
         {
             user.AccessFailedCount++;
@@ -125,6 +125,8 @@ public class AuthService : IAuthService
             await _userManager.UpdateAsync(user);
             throw new LoginException();
         }
+        user.AccessFailedCount = 0;
+        await _userManager.UpdateAsync(user);
         //SignInManager işləmədiyi üçün custom Lockout yazdım
 
         var claims = (await _userManager.GetClaimsAsync(user)).ToList();
@@ -178,8 +180,8 @@ public class AuthService : IAuthService
         await _userManager.UpdateAsync(user);
         return accessToken;
     }
-     
-    
+
+
     public async Task<AccessToken> ConfirmEmailAsync(string token)
     {
         var id = _accessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -189,11 +191,26 @@ public class AuthService : IAuthService
 
 
         var result = await _userManager.ConfirmEmailAsync(user, token);
-        
+
         if (!result.Succeeded)
             throw new InvalidInputException(string.Join(" ", result.Errors.Select(e => e.Description)));
 
 
         return await CreateAccessToken(user);
+    }
+
+    public async Task<AppUserGetDto> GetCurrentUserAsync()
+    {
+        var id = _accessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (id is null)
+            throw new UnAuthorizedException();
+
+        var user =await _userManager.FindByIdAsync(id);
+        if (user is null)
+            throw new UnAuthorizedException();
+
+        var dto = _mapper.Map<AppUserGetDto>(user);
+
+        return dto;
     }
 }

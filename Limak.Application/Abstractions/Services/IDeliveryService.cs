@@ -5,6 +5,6 @@ namespace Limak.Application.Abstractions.Services;
 
 public interface IDeliveryService
 {
-    Task<ResultDto> CreateDelivery(DeliveryPostDto dto);
-    Task<ResultDto> CancelDelivery(int id);
+    Task<ResultDto> CreateDeliveryAsync(DeliveryPostDto dto);
+    Task<ResultDto> CancelDeliveryAsync(int id);
 }

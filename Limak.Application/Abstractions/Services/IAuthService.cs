@@ -12,4 +12,5 @@ public interface IAuthService
     Task<AccessToken> RefreshToken(string refreshToken);
     Task<ResultDto> CreateRolesAsync();
     Task<AccessToken> ChangePasswordAsync(ChangePasswordDto dto);
+    Task<AppUserGetDto> GetCurrentUserAsync();
 }
