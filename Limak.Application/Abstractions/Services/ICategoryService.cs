@@ -9,6 +9,6 @@ public interface ICategoryService
     Task<CategoryGetDto> GetByIdAsync(int id);
     Task<ResultDto> CreateAsync(CategoryPostDto dto);
     Task<ResultDto> UpdateAsync(CategoryPutDto dto);
-    Task<bool> IsExist(int id);
+    Task<bool> IsExistAsync(int id);
     Task<ResultDto> DeleteAsync(int id);
 }

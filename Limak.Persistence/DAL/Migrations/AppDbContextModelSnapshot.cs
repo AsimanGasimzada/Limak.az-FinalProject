@@ -470,6 +470,51 @@ namespace Limak.Persistence.DAL.Migrations
                     b.ToTable("Kargomats");
                 });
 
+            modelBuilder.Entity("Limak.Domain.Entities.News", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(4096)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImagePath")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ModifiedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ModifiedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("News");
+                });
+
             modelBuilder.Entity("Limak.Domain.Entities.Notification", b =>
                 {
                     b.Property<int>("Id")
@@ -802,6 +847,50 @@ namespace Limak.Persistence.DAL.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Limak.Domain.Entities.Tariff", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("CountryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("MaxValue")
+                        .HasColumnType("decimal(5,3)");
+
+                    b.Property<decimal>("MinValue")
+                        .HasColumnType("decimal(5,3)");
+
+                    b.Property<string>("ModifiedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ModifiedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CountryId");
+
+                    b.ToTable("Tariffs");
+                });
+
             modelBuilder.Entity("Limak.Domain.Entities.UserPosition", b =>
                 {
                     b.Property<int>("Id")
@@ -1088,7 +1177,7 @@ namespace Limak.Persistence.DAL.Migrations
             modelBuilder.Entity("Limak.Domain.Entities.Notification", b =>
                 {
                     b.HasOne("Limak.Domain.Entities.AppUser", "AppUser")
-                        .WithMany()
+                        .WithMany("Notifications")
                         .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1179,6 +1268,17 @@ namespace Limak.Persistence.DAL.Migrations
                     b.Navigation("Shop");
                 });
 
+            modelBuilder.Entity("Limak.Domain.Entities.Tariff", b =>
+                {
+                    b.HasOne("Limak.Domain.Entities.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Country");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
@@ -1232,6 +1332,8 @@ namespace Limak.Persistence.DAL.Migrations
 
             modelBuilder.Entity("Limak.Domain.Entities.AppUser", b =>
                 {
+                    b.Navigation("Notifications");
+
                     b.Navigation("Orders");
                 });
 

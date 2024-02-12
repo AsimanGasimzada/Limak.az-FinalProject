@@ -29,23 +29,22 @@ public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int>
     }
 
 
-    public DbSet<Company> Company { get; set; } //only one data
-    public DbSet<Shop> Shops { get; set; }
-    public DbSet<Category> Categories { get; set; }
-    public DbSet<ShopCategory> ShopCategories { get; set; }
-    public DbSet<Order> Orders { get; set; }
-    public DbSet<Status> Statuses { get; set; }
-    public DbSet<Country> Countries { get; set; }
-    public DbSet<Delivery> Deliveries { get; set; }
-    public DbSet<Warehouse> Warehouses { get; set; }
-    public DbSet<Kargomat> Kargomats { get; set; }
-    public DbSet<DeliveryArea> DeliveryAreas { get; set; }
-    public DbSet<Gender> Genders { get; set; }
-    public DbSet<Citizenship> Citizenships { get; set; }
-    public DbSet<UserPosition> UserPositions { get; set; }
-    public DbSet<Notification> Notifications { get; set; }
-
-
-
+    public DbSet<Company> Company { get; set; } = null!; //only one data
+    public DbSet<Shop> Shops { get; set; } = null!;
+    public DbSet<Category> Categories { get; set; } = null!;
+    public DbSet<ShopCategory> ShopCategories { get; set; } = null!;
+    public DbSet<Order> Orders { get; set; } = null!;
+    public DbSet<Status> Statuses { get; set; } = null!;
+    public DbSet<Country> Countries { get; set; } = null!;
+    public DbSet<Delivery> Deliveries { get; set; } = null!;
+    public DbSet<Warehouse> Warehouses { get; set; } = null!;
+    public DbSet<Kargomat> Kargomats { get; set; } = null!;
+    public DbSet<DeliveryArea> DeliveryAreas { get; set; } = null!;
+    public DbSet<Gender> Genders { get; set; } = null!;         
+    public DbSet<Citizenship> Citizenships { get; set; } = null!;
+    public DbSet<UserPosition> UserPositions { get; set; } = null!;
+    public DbSet<Notification> Notifications { get; set; } = null!;
+    public DbSet<News> News { get; set; } = null!;
+    public DbSet<Tariff> Tariffs { get; set; } = null!;
 
 }

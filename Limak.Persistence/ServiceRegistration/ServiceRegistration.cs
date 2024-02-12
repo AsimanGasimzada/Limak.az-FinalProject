@@ -84,6 +84,7 @@ public static class ServiceRegistration
         services.AddScoped<ICompanyService, CompanyService>();
         services.AddScoped<ITransactionService, TransactionService>();
         services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<INewsService, NewsService>();
 
     }
 
@@ -104,6 +105,7 @@ public static class ServiceRegistration
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<ICompanyRepository, CompanyRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddScoped<INewsRepository, NewsRepository>();
 
 
     }

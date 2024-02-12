@@ -37,7 +37,7 @@ public class ShopService : IShopService
 
         foreach (var categoryId in dto.CategoryIds)
         {
-            if (!await _categoryService.IsExist(categoryId))
+            if (!await _categoryService.IsExistAsync(categoryId))
                 throw new NotFoundException($"This Category is not found({categoryId})!");
         }
 
@@ -112,7 +112,7 @@ public class ShopService : IShopService
 
         foreach (var categoryId in dto.CategoryIds)
         {
-            if (!await _categoryService.IsExist(categoryId))
+            if (!await _categoryService.IsExistAsync(categoryId))
                 throw new NotFoundException($"This Category is not found({categoryId})!");
         }
 
