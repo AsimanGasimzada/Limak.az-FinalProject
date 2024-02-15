@@ -39,7 +39,7 @@ public class CountriesController : ControllerBase
         return Ok(await _service.DeleteAsync(id));
     }
     [HttpPut]
-    public async Task<IActionResult> UpdateAsync([FromForm] CountryPutDto dto)
+    public async Task<IActionResult> UpdateAsync(CountryPutDto dto)
     {
 
         return Ok(await _service.UpdateAsync(dto));

@@ -1,6 +1,4 @@
-﻿using Limak.Application.Abstractions.Services;
-using Limak.Application.DTOs.AuthDTOs;
-using Limak.Application.DTOs.HubDTOs;
+﻿using Limak.Application.DTOs.HubDTOs;
 using Limak.Persistence.Utilities.Exceptions.Identity;
 using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;

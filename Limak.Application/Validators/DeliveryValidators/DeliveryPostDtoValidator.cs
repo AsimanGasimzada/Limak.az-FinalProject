@@ -13,6 +13,7 @@ public class DeliveryPostDtoValidator : AbstractValidator<DeliveryPostDto>
         RuleFor(x => x.HomeNo).NotNull().MaximumLength(128).MinimumLength(3);
         RuleFor(x => x.Phone).NotNull().MaximumLength(128).MinimumLength(3);
         RuleFor(x => x.OrderIds).NotNull();
+        RuleFor(x => x.DeliveryAreaId).NotNull();
 
 
 

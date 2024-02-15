@@ -31,7 +31,7 @@ public static class ServiceRegistration
 
     public static WebApplication AddSignalREndpoints(this WebApplication app)
     {
-        app.MapHub<NotificationHub>("/notificationhub");
+        app.MapHub<NotificationHub>("/notificationHub");
 
         return app;
     }
@@ -85,6 +85,7 @@ public static class ServiceRegistration
         services.AddScoped<ITransactionService, TransactionService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<INewsService, NewsService>();
+        services.AddScoped<ITariffService, TariffService>();
 
     }
 
@@ -106,6 +107,7 @@ public static class ServiceRegistration
         services.AddScoped<ICompanyRepository, CompanyRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<INewsRepository, NewsRepository>();
+        services.AddScoped<ITariffRepository, TariffRepository>();
 
 
     }

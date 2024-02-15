@@ -1,11 +1,20 @@
 ﻿using Limak.Domain.Entities.Common;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using System.Security.Claims;
 
 namespace Limak.Persistence.Interceptors;
 
 public class BaseEntityInterceptor : SaveChangesInterceptor
 {
+    private readonly IHttpContextAccessor _contextAccessor;
+
+    public BaseEntityInterceptor(IHttpContextAccessor contextAccessor)
+    {
+        _contextAccessor = contextAccessor;
+    }
+
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
         UpdateEntity(eventData.Context);
@@ -26,8 +35,8 @@ public class BaseEntityInterceptor : SaveChangesInterceptor
             {
                 entry.Entity.CreatedTime = DateTime.UtcNow;
                 entry.Entity.ModifiedTime = DateTime.UtcNow;
-                entry.Entity.CreatedBy = "Asiman";
-                entry.Entity.ModifiedBy = "Asiman";
+                entry.Entity.CreatedBy = _contextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Name) ?? "Null";
+                entry.Entity.ModifiedBy = _contextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Name) ?? "Null"; ;
                 entry.Entity.IsDeleted = false;
             }
             if (entry.State is EntityState.Modified)

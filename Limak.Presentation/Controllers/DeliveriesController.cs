@@ -24,7 +24,7 @@ public class DeliveriesController : ControllerBase
         return Ok(await _service.CreateDeliveryAsync(dto));
     }
 
-    [HttpDelete]
+    [HttpDelete("/{id}")]
     [Authorize(Roles ="Admin,Moderator")]
     public async Task<IActionResult> CancelDeliveryAsync(int id)
     {

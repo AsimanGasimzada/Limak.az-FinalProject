@@ -49,4 +49,29 @@ public class AuthController : ControllerBase
     {
         return Ok(await _service.ChangePasswordAsync(dto));
     }
+
+
+    [HttpPost("[action]")]
+    public async Task<IActionResult> ConfirmEmail(ConfirmEmailDto dto)
+    {
+        return Ok(await _service.ConfirmEmailAsync(dto));
+    }
+
+
+    [HttpPost("[action]")]
+    public async Task<IActionResult> ForgetPassword(ForgetPasswordDto dto)
+    {
+        return Ok(await _service.SendForgetPasswordMail(dto));
+    }
+
+
+
+    [HttpPost("[action]")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordTokenDto dto)
+    {
+        return Ok(await _service.ResetPasswordAsync(dto));
+    }
+
+
+
 }

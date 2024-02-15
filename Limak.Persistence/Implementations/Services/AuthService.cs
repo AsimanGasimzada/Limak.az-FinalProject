@@ -23,7 +23,10 @@ public class AuthService : IAuthService
     private readonly IMapper _mapper;
     private readonly IHttpContextAccessor _accessor;
     private readonly IEmailHelper _emailHelper;
-    public AuthService(UserManager<AppUser> userManager, IMapper mapper, RoleManager<IdentityRole<int>> roleManager, ITokenHelper tokenHelper, IHttpContextAccessor accessor, IEmailHelper emailHelper)
+    private readonly ICitizenshipService _citizenshipService;
+    private readonly IUserPositionService _userPositionService;
+    private readonly IWarehouseService _warehouseService;
+    public AuthService(UserManager<AppUser> userManager, IMapper mapper, RoleManager<IdentityRole<int>> roleManager, ITokenHelper tokenHelper, IHttpContextAccessor accessor, IEmailHelper emailHelper, ICitizenshipService citizenshipService, IUserPositionService userPositionService, IWarehouseService warehouseService)
     {
         _userManager = userManager;
         _mapper = mapper;
@@ -31,17 +34,33 @@ public class AuthService : IAuthService
         _tokenHelper = tokenHelper;
         _accessor = accessor;
         _emailHelper = emailHelper;
+        _citizenshipService = citizenshipService;
+        _userPositionService = userPositionService;
+        _warehouseService = warehouseService;
     }
 
-    public async Task<AccessToken> RegisterAsync(RegisterDto dto)
+    public async Task<ResultDto> RegisterAsync(RegisterDto dto)
     {
         var isExistSerialNumber = await _userManager.Users.AnyAsync(x => x.SeriaNumber == dto.SeriaNumber);
         if (isExistSerialNumber)
-            throw new ConflictException("This Serial Number also exists in the user");
+            throw new ConflictException($"{dto.SeriaNumber}-This Serial Number also exists in the user");
 
         var isExistFincode = await _userManager.Users.AnyAsync(x => x.FinCode == dto.FinCode);
         if (isExistFincode)
-            throw new ConflictException("This Fincode also exists in the user");
+            throw new ConflictException($"{dto.FinCode}-This Fincode also exists in the user");
+
+        var isExistUserPosition = await _userPositionService.IsExist(dto.UserPositionId);
+        if (!isExistUserPosition)
+            throw new NotFoundException($"{dto.UserPositionId}-this User position is not found");
+
+        var isExistCitizenship = await _citizenshipService.IsExist(dto.CitizenshipId);
+        if (!isExistCitizenship)
+            throw new NotFoundException($"{dto.CitizenshipId}-this Citizenship is not found");
+
+        var isExistWarehouseId = await _warehouseService.IsExist(dto.WarehouseId);
+        if (!isExistWarehouseId)
+            throw new NotFoundException($"{dto.WarehouseId}-this Warehouse is not found");
+
 
         var user = _mapper.Map<AppUser>(dto);
         user.UserName = Guid.NewGuid().ToString().Substring(0, 6).ToUpper();
@@ -60,16 +79,11 @@ public class AuthService : IAuthService
         user.RefreshTokenExpiredAt = accessToken.RefreshTokenExpiredAt;
         await _userManager.UpdateAsync(user);
 
-        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        await _emailHelper.SendEmailAsync(new()
-        {
-            Subject = "Confirm Email",
-            Body = token,
-            ToEmail = user.Email
-        });
+
+        await SendEmailConfirmRequest(user);
 
 
-        return accessToken;
+        return new($"The user has been successfully created, please check your email inbox for email confirmation.");
     }
     public async Task<ResultDto> CreateRolesAsync()
     {
@@ -81,7 +95,7 @@ public class AuthService : IAuthService
     }
     private async Task<List<Claim>> ClaimsCreateAsync(AppUser user)
     {
-        var roles = await _userManager.GetRolesAsync(user);
+        var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
         var claims = new List<Claim>() {
 
             new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
@@ -90,7 +104,7 @@ public class AuthService : IAuthService
             new Claim("PhoneNumber",user.PhoneNumber),
             new Claim("FinCode",user.FinCode),
             new Claim("SerialNumber",user.SeriaNumber),
-            new Claim(ClaimTypes.Role, roles.FirstOrDefault())
+            new Claim(ClaimTypes.Role, role?.ToString() ?? "")
 
         };
 
@@ -156,7 +170,7 @@ public class AuthService : IAuthService
 
     public async Task<AccessToken> ChangePasswordAsync(ChangePasswordDto dto)
     {
-        var id = _accessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var id = _accessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
         var user = await _userManager.FindByIdAsync(id);
         if (user is null)
             throw new NotFoundException("User is not found!");
@@ -171,26 +185,16 @@ public class AuthService : IAuthService
 
         return accessToken;
     }
-    private async Task<AccessToken> CreateAccessToken(AppUser? user)
-    {
-        var claims = (await _userManager.GetClaimsAsync(user)).ToList();
-        var accessToken = _tokenHelper.CreateToken(claims);
-        user.RefreshToken = accessToken.RefreshToken;
-        user.RefreshTokenExpiredAt = accessToken.RefreshTokenExpiredAt;
-        await _userManager.UpdateAsync(user);
-        return accessToken;
-    }
 
 
-    public async Task<AccessToken> ConfirmEmailAsync(string token)
+    public async Task<AccessToken> ConfirmEmailAsync(ConfirmEmailDto dto)
     {
-        var id = _accessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var user = await _userManager.FindByIdAsync(id);
+        var user = await _userManager.FindByIdAsync(dto.AppUserId);
         if (user is null)
             throw new NotFoundException("User is not found!");
 
 
-        var result = await _userManager.ConfirmEmailAsync(user, token);
+        var result = await _userManager.ConfirmEmailAsync(user, dto.Token);
 
         if (!result.Succeeded)
             throw new InvalidInputException(string.Join(" ", result.Errors.Select(e => e.Description)));
@@ -205,7 +209,7 @@ public class AuthService : IAuthService
         if (id is null)
             throw new UnAuthorizedException();
 
-        var user =await _userManager.FindByIdAsync(id);
+        var user = await _userManager.FindByIdAsync(id);
         if (user is null)
             throw new UnAuthorizedException();
 
@@ -213,4 +217,88 @@ public class AuthService : IAuthService
 
         return dto;
     }
+
+
+
+    public async Task<ResultDto> SendForgetPasswordMail(ForgetPasswordDto dto)
+    {
+        var user = await _userManager.FindByEmailAsync(dto.Email);
+        if (user is null)
+            throw new NotFoundException($"{dto.Email}-this user is not found!");
+
+
+        string token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+        string path = Path.Combine("http://localhost:3000", "ForgetPassword", $"AppUserId={user.Id}", $"token={token}");
+        string body = _resetPasswordBody.Replace("{Replace_Link_1}", path);
+        body = body.Replace("{Replace_Link_2}", path);
+        body = body.Replace("{Replace_Link_3}", path);
+
+
+        await _emailHelper.SendEmailAsync(new() { ToEmail = user.Email, Subject = "Limak.az Şifrə yeniləmə", Body = body });
+
+        return new("The password reset link has been successfully sent to your email");
+    }
+
+
+
+
+
+    public async Task<AppUserGetDto> CheckResetPasswordToken(ForgetPasswordTokenDto dto)
+    {
+        var user = await _getUserById(dto.AppUserId);
+
+        var userDto = _mapper.Map<AppUserGetDto>(user);
+
+        return userDto;
+    }
+    public async Task<AccessToken> ResetPasswordAsync(ResetPasswordTokenDto dto)
+    {
+        var user = await _getUserById(dto.AppUserId);
+
+        var result=await _userManager.ResetPasswordAsync(user,dto.Token,dto.Password);
+        if(!result.Succeeded)
+            throw new InvalidInputException(string.Join(" ", result.Errors.Select(e => e.Description)));
+
+
+        return await CreateAccessToken(user);
+    }
+
+    private async Task<AppUser> _getUserById(string id)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+
+        if (user is null)
+            throw new NotFoundException("This user is not found");
+        return user;
+    }
+
+
+
+
+    private async Task SendEmailConfirmRequest(AppUser user)
+    {
+        string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        string path = Path.Combine("http://localhost:3000", "ConfirmEmail", $"AppUserId={user.Id}", $"token={token}");
+        string body = _confirmEmailBody.Replace("{Replace_Link_1}", path);
+        body = body.Replace("{Replace_Link_2}", path);
+        body = body.Replace("{Replace_Link_3}", path);
+
+
+        await _emailHelper.SendEmailAsync(new() { ToEmail = user.Email, Subject = "Limak.az Email Təsdiqləmə", Body = body });
+    }
+
+    private async Task<AccessToken> CreateAccessToken(AppUser user)
+    {
+        var claims = (await _userManager.GetClaimsAsync(user)).ToList();
+        var accessToken = _tokenHelper.CreateToken(claims);
+        user.RefreshToken = accessToken.RefreshToken;
+        user.RefreshTokenExpiredAt = accessToken.RefreshTokenExpiredAt;
+        await _userManager.UpdateAsync(user);
+        return accessToken;
+    }
+
+
+    private string _resetPasswordBody = "<!DOCTYPE html>\r\n<html lang=\"az\">\r\n<head>\r\n<meta charset=\"UTF-8\">\r\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n<title>Şifrəni Sıfırla</title>\r\n</head>\r\n<body style=\"font-family: 'Roboto', sans-serif; background-color: #f4f4f4; padding: 20px; font-weight: 600;\">\r\n\r\n<div style=\"max-width: 600px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">\r\n    <h2 style=\"text-align: center; color: #D18337; font-weight: bold;\">Şifrəni Sıfırla</h2>\r\n    <p style=\"color: #555; text-align: justify;\">Salam,</p>\r\n    <p style=\"color: #555; text-align: justify;\">Hesabınızın şifrəsini sıfırlamaq üçün aşağıdakı düyməyə basın:</p>\r\n    <div style=\"text-align: center; margin-top: 20px;\">\r\n        <a href=\"{Replace_Link_1}\" style=\"display: inline-block; background-color: #D18337; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-weight: bold;\">Şifrəni Sıfırla</a>\r\n    </div>\r\n    <p style=\"color: #555; text-align: justify; margin-top: 20px;\">Yuxarıdakı düyməyə basmaqda problemlə qarşılaşırsınızsa, aşağıdakı linki brauzerinizin ünvan panelinə yapışdırın:</p>\r\n    <p style=\"color: #555; text-align: center;\"><a href=\"{Replace_Link_2}\" style=\"color: #D18337; text-decoration: none; font-weight: bold;\">{Replace_Link_3}</a></p>\r\n    <p style=\"color: #555; text-align: justify; margin-top: 20px;\">Əgər siz bu sorğunu etməmisinizsə, lütfən diqqət etməyin.</p>\r\n    <p style=\"color: #555; text-align: justify;\">Sağ olun!</p>\r\n    <p style=\"color: #D18337; text-align: justify;\">Bu e-poçt Limak.az tərəfindən göndərilmişdir.</p>\r\n</div>\r\n\r\n</body>\r\n</html>\r\n";
+    private string _confirmEmailBody = "<!DOCTYPE html>\r\n<html lang=\"az\">\r\n<head>\r\n<meta charset=\"UTF-8\">\r\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n<title>Email Təsdiqi</title>\r\n</head>\r\n<body style=\"font-family: 'Roboto', sans-serif; background-color: #f4f4f4; padding: 20px; font-weight: 600;\">\r\n\r\n<div style=\"max-width: 600px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">\r\n    <h2 style=\"text-align: center; color: #D18337; font-weight: bold;\">E-poçt Təsdiqi</h2>\r\n    <p style=\"color: #555; text-align: justify;\">Salam,</p>\r\n    <p style=\"color: #555; text-align: justify;\">E-poçt ünvanınızı təsdiq etmək üçün aşağıdakı düyməyə basın:</p>\r\n    <div style=\"text-align: center; margin-top: 20px;\">\r\n        <a href=\"{Replace_Link_1}\" style=\"display: inline-block; background-color: #D18337; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-weight: bold;\">E-poçt Ünvanımı Təsdiq Et</a>\r\n    </div>\r\n    <p style=\"color: #555; text-align: justify; margin-top: 20px;\">Yuxarıdakı düyməyə basmaqda problemlə qarşılaşırsınızsa, aşağıdakı linki brauzerinizin ünvan panelinə yapışdırın:</p>\r\n    <p style=\"color: #555; text-align: center;\"><a href=\"{Replace_Link_2}\" style=\"color: #D18337; text-decoration: none; font-weight: bold;\">{Replace_Link_3}</a></p>\r\n    <p style=\"color: #555; text-align: justify; margin-top: 20px;\">Əgər bu e-poçtu gözləmirdinizsə, lütfən diqqət etməyin.</p>\r\n    <p style=\"color: #555; text-align: justify;\">Sağ olun!</p>\r\n    <p style=\"color: #D18337; text-align: justify;\">Bu e-poçt Limak.az tərəfindən göndərilmişdir.</p>\r\n</div>\r\n\r\n</body>\r\n</html>\r\n";
 }

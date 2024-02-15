@@ -8,6 +8,6 @@ public class LoginDtoValidator : AbstractValidator<LoginDto>
     public LoginDtoValidator()
     {
         RuleFor(x => x.Email).NotNull().MaximumLength(256);
-        RuleFor(x => x.Email).NotNull().MaximumLength(64).MinimumLength(6);
+        RuleFor(x => x.Password).NotNull().MaximumLength(64).MinimumLength(6);
     }
 }

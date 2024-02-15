@@ -48,4 +48,5 @@ public class CategoriesController : ControllerBase
 
         return Ok(await _service.UpdateAsync(dto));
     }
+
 }
