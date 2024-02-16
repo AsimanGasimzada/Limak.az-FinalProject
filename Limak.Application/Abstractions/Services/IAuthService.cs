@@ -16,4 +16,7 @@ public interface IAuthService
     Task<ResultDto> SendForgetPasswordMail(ForgetPasswordDto dto);
     Task<AppUserGetDto> CheckResetPasswordToken(ForgetPasswordTokenDto dto);
     Task<AccessToken> ResetPasswordAsync(ResetPasswordTokenDto dto);
+    Task<AppUserGetDto> GetUserByIdAsync(int id);   
+    Task<List<AppUserGetDto>> GetAllUsersAsync();
+    Task<List<AppUserGetDto>> GetAllModeratorsAsync();
 }

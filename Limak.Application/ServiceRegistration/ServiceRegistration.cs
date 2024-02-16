@@ -7,12 +7,12 @@ namespace Limak.Application.ServiceRegistration;
 
 public static class ServiceRegistration
 {
-    public static IServiceCollection AddApplicationServices(this IServiceCollection service)
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        service.AddAutoMapper(Assembly.GetExecutingAssembly());
+        services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
-        service.AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining(typeof(ShopPostDtoValidator)));
+        services.AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining(typeof(ShopPostDtoValidator)));
 
-        return service;
+        return services;
     }
 }

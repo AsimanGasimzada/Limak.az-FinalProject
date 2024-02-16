@@ -20,6 +20,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(x => x.Size).IsRequired().HasMaxLength(128);
         builder.Property(x => x.Notes).IsRequired().HasMaxLength(256);
         builder.Property(x => x.AdditionFees).HasColumnType("decimal(18,2)");
+        builder.Property(x => x.TotalPrice).HasColumnType("decimal(18,2)");
         builder.Property(x => x.AdditionFeesNotes).HasMaxLength(256);
         builder.Property(x => x.CancellationNotes).HasMaxLength(256);
 

@@ -40,11 +40,13 @@ public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int>
     public DbSet<Warehouse> Warehouses { get; set; } = null!;
     public DbSet<Kargomat> Kargomats { get; set; } = null!;
     public DbSet<DeliveryArea> DeliveryAreas { get; set; } = null!;
-    public DbSet<Gender> Genders { get; set; } = null!;         
+    public DbSet<Gender> Genders { get; set; } = null!;
     public DbSet<Citizenship> Citizenships { get; set; } = null!;
     public DbSet<UserPosition> UserPositions { get; set; } = null!;
     public DbSet<Notification> Notifications { get; set; } = null!;
     public DbSet<News> News { get; set; } = null!;
     public DbSet<Tariff> Tariffs { get; set; } = null!;
+    public DbSet<Chat> Chats { get; set; } = null!;
+    public DbSet<Message> Messages { get; set; } = null!;
 
 }

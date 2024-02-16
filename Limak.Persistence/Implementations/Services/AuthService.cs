@@ -256,8 +256,8 @@ public class AuthService : IAuthService
     {
         var user = await _getUserById(dto.AppUserId);
 
-        var result=await _userManager.ResetPasswordAsync(user,dto.Token,dto.Password);
-        if(!result.Succeeded)
+        var result = await _userManager.ResetPasswordAsync(user, dto.Token, dto.Password);
+        if (!result.Succeeded)
             throw new InvalidInputException(string.Join(" ", result.Errors.Select(e => e.Description)));
 
 
@@ -297,6 +297,34 @@ public class AuthService : IAuthService
         await _userManager.UpdateAsync(user);
         return accessToken;
     }
+
+    public async Task<AppUserGetDto> GetUserByIdAsync(int id)
+    {
+        var user = await _userManager.FindByIdAsync(id.ToString());
+        if (user is null)
+            throw new NotFoundException("User is not found");
+
+        var dto = _mapper.Map<AppUserGetDto>(user);
+
+        return dto;
+    }
+
+    public async Task<List<AppUserGetDto>> GetAllUsersAsync()
+    {
+        var users = await _userManager.Users.ToListAsync();
+        var dtos=_mapper.Map<List<AppUserGetDto>>(users);
+        return dtos;
+    }
+
+    public async Task<List<AppUserGetDto>> GetAllModeratorsAsync()
+    {
+        var users=await _userManager.GetUsersInRoleAsync(IdentityRoles.Moderator.ToString());
+        var dtos = _mapper.Map<List<AppUserGetDto>>(users);
+        return dtos;
+    }
+
+
+
 
 
     private string _resetPasswordBody = "<!DOCTYPE html>\r\n<html lang=\"az\">\r\n<head>\r\n<meta charset=\"UTF-8\">\r\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n<title>Şifrəni Sıfırla</title>\r\n</head>\r\n<body style=\"font-family: 'Roboto', sans-serif; background-color: #f4f4f4; padding: 20px; font-weight: 600;\">\r\n\r\n<div style=\"max-width: 600px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">\r\n    <h2 style=\"text-align: center; color: #D18337; font-weight: bold;\">Şifrəni Sıfırla</h2>\r\n    <p style=\"color: #555; text-align: justify;\">Salam,</p>\r\n    <p style=\"color: #555; text-align: justify;\">Hesabınızın şifrəsini sıfırlamaq üçün aşağıdakı düyməyə basın:</p>\r\n    <div style=\"text-align: center; margin-top: 20px;\">\r\n        <a href=\"{Replace_Link_1}\" style=\"display: inline-block; background-color: #D18337; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-weight: bold;\">Şifrəni Sıfırla</a>\r\n    </div>\r\n    <p style=\"color: #555; text-align: justify; margin-top: 20px;\">Yuxarıdakı düyməyə basmaqda problemlə qarşılaşırsınızsa, aşağıdakı linki brauzerinizin ünvan panelinə yapışdırın:</p>\r\n    <p style=\"color: #555; text-align: center;\"><a href=\"{Replace_Link_2}\" style=\"color: #D18337; text-decoration: none; font-weight: bold;\">{Replace_Link_3}</a></p>\r\n    <p style=\"color: #555; text-align: justify; margin-top: 20px;\">Əgər siz bu sorğunu etməmisinizsə, lütfən diqqət etməyin.</p>\r\n    <p style=\"color: #555; text-align: justify;\">Sağ olun!</p>\r\n    <p style=\"color: #D18337; text-align: justify;\">Bu e-poçt Limak.az tərəfindən göndərilmişdir.</p>\r\n</div>\r\n\r\n</body>\r\n</html>\r\n";

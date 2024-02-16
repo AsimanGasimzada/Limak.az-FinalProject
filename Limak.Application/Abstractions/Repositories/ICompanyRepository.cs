@@ -6,3 +6,4 @@ namespace Limak.Application.Abstractions.Repositories;
 public interface ICompanyRepository:IRepository<Company>
 {
 }
+
