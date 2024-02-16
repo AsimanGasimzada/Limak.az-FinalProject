@@ -74,4 +74,10 @@ public class AuthController : ControllerBase
 
 
 
+    [HttpGet("[action]")]
+    public async Task<IActionResult> GetCurrentUserInfo()
+    {
+        return Ok(await _service.GetCurrentUserAsync());
+    }
+
 }

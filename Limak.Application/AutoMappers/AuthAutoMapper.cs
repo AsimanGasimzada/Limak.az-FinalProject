@@ -10,6 +10,5 @@ public class AuthAutoMapper:Profile
     {
         CreateMap<AppUser, RegisterDto>().ReverseMap();
         CreateMap<AppUser, AppUserGetDto>().ReverseMap();
-
     }
 }
