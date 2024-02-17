@@ -18,6 +18,14 @@ public class AuthController : ControllerBase
 
 
 
+    [HttpGet("[action]")]
+    [Authorize]
+    public async Task<IActionResult> GetCurrentUserInfo()
+    {
+        return Ok(await _service.GetCurrentUserAsync());
+    }
+
+
     [HttpPost("[action]")]
     public async Task<IActionResult> Register([FromBody] RegisterDto dto)
     {
@@ -36,27 +44,6 @@ public class AuthController : ControllerBase
         return Ok(await _service.CreateRolesAsync());
     }
 
-    [HttpPost("[action]")]
-    public async Task<IActionResult> RefreshToken(string refreshToken)
-    {
-        return Ok(await _service.RefreshToken(refreshToken));
-    }
-
-
-    [HttpPost("[action]")]
-    [Authorize]
-    public async Task<IActionResult> ChangePassword(ChangePasswordDto dto)
-    {
-        return Ok(await _service.ChangePasswordAsync(dto));
-    }
-
-
-    [HttpPost("[action]")]
-    public async Task<IActionResult> ConfirmEmail(ConfirmEmailDto dto)
-    {
-        return Ok(await _service.ConfirmEmailAsync(dto));
-    }
-
 
     [HttpPost("[action]")]
     public async Task<IActionResult> ForgetPassword(ForgetPasswordDto dto)
@@ -65,8 +52,16 @@ public class AuthController : ControllerBase
     }
 
 
+    [HttpPut("[action]")]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword(ChangePasswordDto dto)
+    {
+        return Ok(await _service.ChangePasswordAsync(dto));
+    }
 
-    [HttpPost("[action]")]
+
+
+    [HttpPut("[action]")]
     public async Task<IActionResult> ResetPassword(ResetPasswordTokenDto dto)
     {
         return Ok(await _service.ResetPasswordAsync(dto));
@@ -74,10 +69,51 @@ public class AuthController : ControllerBase
 
 
 
-    [HttpGet("[action]")]
-    public async Task<IActionResult> GetCurrentUserInfo()
+    
+
+
+    [HttpPut("[action]")]
+    [Authorize]
+    public async Task<IActionResult> EditUserAccountDatas(AppUserAccountDataPutDto dto)
     {
-        return Ok(await _service.GetCurrentUserAsync());
+        return Ok(await _service.EditUserAccountDatas(dto));
     }
+
+
+
+    [HttpPut("[action]")]
+    [Authorize]
+    public async Task<IActionResult> EditUserPersonalDatas(AppUserPersonalDataPutDto dto)
+    {
+        return Ok(await _service.EditUserPersonalDatas(dto));
+    }
+
+
+
+
+    [HttpPatch("[action]")]
+    [Authorize]
+    public async Task<IActionResult> ChangeEmail(ChangeEmailDto dto)
+    {
+        return Ok(await _service.ChangeEmailAsync(dto));
+    }
+
+
+
+
+    [HttpPatch("[action]")]
+    public async Task<IActionResult> ConfirmEmail(ConfirmEmailDto dto)
+    {
+        return Ok(await _service.ConfirmEmailAsync(dto));
+    }
+
+    [HttpPatch("[action]")]
+    public async Task<IActionResult> RefreshToken(string refreshToken)
+    {
+        return Ok(await _service.RefreshToken(refreshToken));
+    }
+
+
+
 
 }

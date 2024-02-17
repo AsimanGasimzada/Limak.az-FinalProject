@@ -36,12 +36,11 @@ public class MessageService : IMessageService
             throw new NotFoundException($"{dto.ChatId}-Chat is not found");
 
         var message = _mapper.Map<Message>(dto);
-
+        message.AppUserId = user.Id;
         if (dto.File is not null)
         {
-            if (!dto.File.ValidateSize(5))
-                throw new InvalidInputException("The size of the file cannot be more than 5 MB");
 
+            dto.File.ValidateImage(5);
             message.FilePath = await _cloudinaryService.FileCreateAsync(dto.File);
         }
 

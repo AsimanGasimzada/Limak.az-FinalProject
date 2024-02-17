@@ -16,6 +16,6 @@ public class RegisterDto
     public int CitizenshipId { get; set; }
     public int UserPositionId { get; set; }
     public int WarehouseId { get; set; }
-    
+
 
 }

@@ -26,7 +26,9 @@ public class AuthService : IAuthService
     private readonly ICitizenshipService _citizenshipService;
     private readonly IUserPositionService _userPositionService;
     private readonly IWarehouseService _warehouseService;
-    public AuthService(UserManager<AppUser> userManager, IMapper mapper, RoleManager<IdentityRole<int>> roleManager, ITokenHelper tokenHelper, IHttpContextAccessor accessor, IEmailHelper emailHelper, ICitizenshipService citizenshipService, IUserPositionService userPositionService, IWarehouseService warehouseService)
+    private readonly IGenderService _genderService;
+
+    public AuthService(UserManager<AppUser> userManager, IMapper mapper, RoleManager<IdentityRole<int>> roleManager, ITokenHelper tokenHelper, IHttpContextAccessor accessor, IEmailHelper emailHelper, ICitizenshipService citizenshipService, IUserPositionService userPositionService, IWarehouseService warehouseService, IGenderService genderService)
     {
         _userManager = userManager;
         _mapper = mapper;
@@ -37,6 +39,7 @@ public class AuthService : IAuthService
         _citizenshipService = citizenshipService;
         _userPositionService = userPositionService;
         _warehouseService = warehouseService;
+        _genderService = genderService;
     }
 
     public async Task<ResultDto> RegisterAsync(RegisterDto dto)
@@ -60,6 +63,10 @@ public class AuthService : IAuthService
         var isExistWarehouseId = await _warehouseService.IsExist(dto.WarehouseId);
         if (!isExistWarehouseId)
             throw new NotFoundException($"{dto.WarehouseId}-this Warehouse is not found");
+
+        var isExistGender = await _genderService.IsExist(dto.GenderId);
+        if (!isExistCitizenship)
+            throw new NotFoundException($"{dto.GenderId}-this Gender is not found");
 
 
         var user = _mapper.Map<AppUser>(dto);
@@ -93,25 +100,6 @@ public class AuthService : IAuthService
         }
         return new("Successfully Created");
     }
-    private async Task<List<Claim>> ClaimsCreateAsync(AppUser user)
-    {
-        var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
-        var claims = new List<Claim>() {
-
-            new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
-            new Claim(ClaimTypes.Name,user.UserName),
-            new Claim(ClaimTypes.Email,user.Email),
-            new Claim("PhoneNumber",user.PhoneNumber),
-            new Claim("FinCode",user.FinCode),
-            new Claim("SerialNumber",user.SeriaNumber),
-            new Claim(ClaimTypes.Role, role?.ToString() ?? "")
-
-        };
-
-
-        return claims;
-    }
-
     public async Task<AccessToken> LoginAsync(LoginDto dto)
     {
         var user = await _userManager.FindByEmailAsync(dto.Email);
@@ -151,7 +139,6 @@ public class AuthService : IAuthService
 
         return accessToken;
     }
-
     public async Task<AccessToken> RefreshToken(string refreshToken)
     {
         var user = await _userManager.Users.FirstOrDefaultAsync(x => x.RefreshToken == refreshToken);
@@ -165,9 +152,6 @@ public class AuthService : IAuthService
 
         return accessToken;
     }
-
-
-
     public async Task<AccessToken> ChangePasswordAsync(ChangePasswordDto dto)
     {
         var id = _accessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -185,8 +169,6 @@ public class AuthService : IAuthService
 
         return accessToken;
     }
-
-
     public async Task<AccessToken> ConfirmEmailAsync(ConfirmEmailDto dto)
     {
         var user = await _userManager.FindByIdAsync(dto.AppUserId);
@@ -202,7 +184,6 @@ public class AuthService : IAuthService
 
         return await CreateAccessToken(user);
     }
-
     public async Task<AppUserGetDto> GetCurrentUserAsync()
     {
         var id = _accessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -217,9 +198,6 @@ public class AuthService : IAuthService
 
         return dto;
     }
-
-
-
     public async Task<ResultDto> SendForgetPasswordMail(ForgetPasswordDto dto)
     {
         var user = await _userManager.FindByEmailAsync(dto.Email);
@@ -239,11 +217,28 @@ public class AuthService : IAuthService
 
         return new("The password reset link has been successfully sent to your email");
     }
+    public async Task<AppUserGetDto> GetUserByIdAsync(int id)
+    {
+        var user = await _userManager.FindByIdAsync(id.ToString());
+        if (user is null)
+            throw new NotFoundException("User is not found");
 
+        var dto = _mapper.Map<AppUserGetDto>(user);
 
-
-
-
+        return dto;
+    }
+    public async Task<List<AppUserGetDto>> GetAllUsersAsync()
+    {
+        var users = await _userManager.Users.ToListAsync();
+        var dtos = _mapper.Map<List<AppUserGetDto>>(users);
+        return dtos;
+    }
+    public async Task<List<AppUserGetDto>> GetAllModeratorsAsync()
+    {
+        var users = await _userManager.GetUsersInRoleAsync(IdentityRoles.Moderator.ToString());
+        var dtos = _mapper.Map<List<AppUserGetDto>>(users);
+        return dtos;
+    }
     public async Task<AppUserGetDto> CheckResetPasswordToken(ForgetPasswordTokenDto dto)
     {
         var user = await _getUserById(dto.AppUserId);
@@ -263,6 +258,80 @@ public class AuthService : IAuthService
 
         return await CreateAccessToken(user);
     }
+    public async Task<ResultDto> EditUserAccountDatas(AppUserAccountDataPutDto dto)
+    {
+
+        var isExistWarehouseId = await _warehouseService.IsExist(dto.WarehouseId);
+        if (!isExistWarehouseId)
+            throw new NotFoundException($"{dto.WarehouseId}-this Warehouse is not found");
+
+
+        var userDto = await GetCurrentUserAsync();
+
+        var user = await _getUserById(userDto.Id.ToString());
+
+
+        user = _mapper.Map(dto, user);
+
+        if (userDto.Email != dto.Email)
+        {
+            await SendEmailChangeRequest(user, dto.Email);
+            user.EmailConfirmed = false;
+        }
+
+        await _userManager.UpdateAsync(user);
+
+        if (userDto.Email != dto.Email)
+            return new("To verify your email, click on the link sent to your email address");
+
+        return new("User successfully updated");
+
+    }
+    public async Task<AccessToken> ChangeEmailAsync(ChangeEmailDto dto)
+    {
+        var user = await _getUserById(dto.Id.ToString());
+        var currentUser = await GetCurrentUserAsync();
+        if (user.Id != currentUser.Id)
+            throw new UnAuthorizedException();
+
+        var result = await _userManager.ChangeEmailAsync(user, dto.Email, dto.Token);
+
+        if (!result.Succeeded)
+            throw new InvalidInputException(string.Join(" ", result.Errors.Select(e => e.Description)));
+
+        return await CreateAccessToken(user);
+    }
+    public async Task<ResultDto> EditUserPersonalDatas(AppUserPersonalDataPutDto dto)
+    {
+
+        var userDto = await GetCurrentUserAsync();
+        var user = await _getUserById(userDto.Id.ToString());
+
+        var isExistSerialNumber = await _userManager.Users.AnyAsync(x => x.SeriaNumber == dto.SeriaNumber && x.Id != user.Id);
+        if (isExistSerialNumber)
+            throw new ConflictException($"{dto.SeriaNumber}-This Serial Number also exists in the user");
+
+        var isExistFincode = await _userManager.Users.AnyAsync(x => x.FinCode == dto.FinCode && x.Id != user.Id);
+        if (isExistFincode)
+            throw new ConflictException($"{dto.FinCode}-This Fincode also exists in the user");
+
+        var isExistCitizenship = await _citizenshipService.IsExist(dto.CitizenshipId);
+        if (!isExistCitizenship)
+            throw new NotFoundException($"{dto.CitizenshipId}-this Citizenship is not found");
+
+        var isExistGender = await _genderService.IsExist(dto.GenderId);
+        if (!isExistCitizenship)
+            throw new NotFoundException($"{dto.GenderId}-this Gender is not found");
+
+
+        user = _mapper.Map(dto, user);
+
+        await _userManager.UpdateAsync(user);
+
+        return new("User successfully updated");
+
+    }
+
 
     private async Task<AppUser> _getUserById(string id)
     {
@@ -272,10 +341,15 @@ public class AuthService : IAuthService
             throw new NotFoundException("This user is not found");
         return user;
     }
-
-
-
-
+    private async Task<AccessToken> CreateAccessToken(AppUser user)
+    {
+        var claims = (await _userManager.GetClaimsAsync(user)).ToList();
+        var accessToken = _tokenHelper.CreateToken(claims);
+        user.RefreshToken = accessToken.RefreshToken;
+        user.RefreshTokenExpiredAt = accessToken.RefreshTokenExpiredAt;
+        await _userManager.UpdateAsync(user);
+        return accessToken;
+    }
     private async Task SendEmailConfirmRequest(AppUser user)
     {
         string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -287,41 +361,36 @@ public class AuthService : IAuthService
 
         await _emailHelper.SendEmailAsync(new() { ToEmail = user.Email, Subject = "Limak.az Email Təsdiqləmə", Body = body });
     }
-
-    private async Task<AccessToken> CreateAccessToken(AppUser user)
+    private async Task SendEmailChangeRequest(AppUser user, string email)
     {
-        var claims = (await _userManager.GetClaimsAsync(user)).ToList();
-        var accessToken = _tokenHelper.CreateToken(claims);
-        user.RefreshToken = accessToken.RefreshToken;
-        user.RefreshTokenExpiredAt = accessToken.RefreshTokenExpiredAt;
-        await _userManager.UpdateAsync(user);
-        return accessToken;
+        string token = await _userManager.GenerateChangeEmailTokenAsync(user, email); //bu setirde token yaradıb emaili change edir ona görə çağırdığım yerdə emailConfirm ı false vermişəm
+        string path = Path.Combine("http://localhost:3000", "ChangeEmail", $"AppUserId={user.Id}", $"token={token}", $"email={email}");
+        string body = _confirmEmailBody.Replace("{Replace_Link_1}", path);
+        body = body.Replace("{Replace_Link_2}", path);
+        body = body.Replace("{Replace_Link_3}", path);
+
+
+        await _emailHelper.SendEmailAsync(new() { ToEmail = email, Subject = "Limak.az Email Yeniləmə", Body = body });
+    }
+    private async Task<List<Claim>> ClaimsCreateAsync(AppUser user)
+    {
+        var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+        var claims = new List<Claim>() {
+
+            new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
+            new Claim(ClaimTypes.Name,user.UserName),
+            new Claim(ClaimTypes.Email,user.Email),
+            new Claim("PhoneNumber",user.PhoneNumber),
+            new Claim("FinCode",user.FinCode),
+            new Claim("SerialNumber",user.SeriaNumber),
+            new Claim(ClaimTypes.Role, role?.ToString() ?? "")
+
+        };
+
+
+        return claims;
     }
 
-    public async Task<AppUserGetDto> GetUserByIdAsync(int id)
-    {
-        var user = await _userManager.FindByIdAsync(id.ToString());
-        if (user is null)
-            throw new NotFoundException("User is not found");
-
-        var dto = _mapper.Map<AppUserGetDto>(user);
-
-        return dto;
-    }
-
-    public async Task<List<AppUserGetDto>> GetAllUsersAsync()
-    {
-        var users = await _userManager.Users.ToListAsync();
-        var dtos=_mapper.Map<List<AppUserGetDto>>(users);
-        return dtos;
-    }
-
-    public async Task<List<AppUserGetDto>> GetAllModeratorsAsync()
-    {
-        var users=await _userManager.GetUsersInRoleAsync(IdentityRoles.Moderator.ToString());
-        var dtos = _mapper.Map<List<AppUserGetDto>>(users);
-        return dtos;
-    }
 
 
 

@@ -8,8 +8,9 @@ public class AppUserGetDto
     public string Surname { get; set; } = null!;
     public string Birtday { get; set; } = null!;
     public string Fincode { get; set; } = null!;
-    public string SerialNumber { get; set; } = null!;
+    public string SeriaNumber { get; set; } = null!;
     public int GenderId { get; set; }
     public string Location { get; set; } = null!;
     public string PhoneNumber { get; set; } = null!;
+    public string Email { get; set; } = null!;
 }
