@@ -62,6 +62,8 @@ public static class ServiceRegistration
             opt.Lockout.AllowedForNewUsers = false;
             opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
             opt.Lockout.MaxFailedAccessAttempts = 3;
+            opt.SignIn.RequireConfirmedEmail = true;
+
 
         }).AddDefaultTokenProviders().AddEntityFrameworkStores<AppDbContext>();
     }
@@ -89,6 +91,7 @@ public static class ServiceRegistration
         services.AddScoped<ITariffService, TariffService>();
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<IMessageService, MessageService>();
+        services.AddScoped<IRequestSubjectService, RequestSubjectService>();
 
     }
 
@@ -113,7 +116,7 @@ public static class ServiceRegistration
         services.AddScoped<ITariffRepository, TariffRepository>();
         services.AddScoped<IChatRepository, ChatRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
-
+        services.AddScoped<IRequestSubjectRepository, RequestSubjectRepository>();
 
     }
     #endregion

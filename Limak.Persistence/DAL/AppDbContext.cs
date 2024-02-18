@@ -28,7 +28,6 @@ public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int>
         optionsBuilder.AddInterceptors(_interceptor);
     }
 
-
     public DbSet<Company> Company { get; set; } = null!; //only one data
     public DbSet<Shop> Shops { get; set; } = null!;
     public DbSet<Category> Categories { get; set; } = null!;
@@ -48,5 +47,8 @@ public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int>
     public DbSet<Tariff> Tariffs { get; set; } = null!;
     public DbSet<Chat> Chats { get; set; } = null!;
     public DbSet<Message> Messages { get; set; } = null!;
+    public DbSet<Request> Requests { get; set; } = null!;
+    public DbSet<RequestMessage> RequestMessages { get; set; } = null!;
+    public DbSet<RequestSubject> RequestSubjects { get; set; } = null!;
 
 }

@@ -36,6 +36,15 @@ public class ChatsController : ControllerBase
         return Ok(await _service.GetAll());
     }
 
+
+    [HttpGet("[action]")]
+    [Authorize(Roles = "Member")]
+    public async Task<IActionResult> GetOnlineChat()
+    {
+        return Ok(await _service.GetOnlineChatAsync());
+    }
+
+
     [HttpGet("{id}")]
     [Authorize(Roles = "Admin,Moderator")]
     public async Task<IActionResult> GetByIdAsync([FromRoute] int id)
@@ -48,6 +57,6 @@ public class ChatsController : ControllerBase
     [Authorize(Roles = "Admin,Moderator")]
     public async Task<IActionResult> SetOperator(ChatPutOperatorDto dto)
     {
-        return Ok(await _service.SetOperatorAsync(dto));    
+        return Ok(await _service.SetOperatorAsync(dto));
     }
 }

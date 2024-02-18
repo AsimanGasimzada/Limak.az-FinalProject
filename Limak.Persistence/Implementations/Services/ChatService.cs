@@ -5,11 +5,7 @@ using Limak.Application.DTOs.ChatDTOs;
 using Limak.Application.DTOs.RepsonseDTOs;
 using Limak.Domain.Entities;
 using Limak.Persistence.Utilities.Exceptions.Common;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Metadata;
-using System.Security.Claims;
 
 namespace Limak.Persistence.Implementations.Services;
 
@@ -23,7 +19,6 @@ public class ChatService : IChatService
     {
         _repository = repository;
         _mapper = mapper;
-
         _notificationService = notificationService;
         _authService = authService;
     }
@@ -104,6 +99,23 @@ public class ChatService : IChatService
         await _repository.SaveAsync();
 
         return new("Repository is successfully updated");
+    }
+
+
+
+    public async Task<ChatGetDto> GetOnlineChatAsync()
+    {
+        var user = await _authService.GetCurrentUserAsync();
+        var chat = await _repository.GetSingleAsync(x => x.AppUserId == user.Id);
+        if (chat is null)
+        {
+            await CreateAsync();
+            chat = await _repository.GetSingleAsync(x => x.AppUserId == user.Id);
+        }
+
+        var dto = _mapper.Map<ChatGetDto>(chat);
+ 
+        return dto;
     }
 
 
