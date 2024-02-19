@@ -13,7 +13,7 @@ public interface ICountryService
     Task<bool> IsExist(int id);
     Task<ResultDto> DeleteAsync(int id);
     Task<Country> FirstOrDefaultAsync();
-
+    Task<CountryGetDto> GetByNameAsync(string name);
 }
 
 

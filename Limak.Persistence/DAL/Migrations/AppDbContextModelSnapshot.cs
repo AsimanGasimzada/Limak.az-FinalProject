@@ -807,6 +807,9 @@ namespace Limak.Persistence.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("AppUserId")
+                        .HasColumnType("int");
+
                     b.Property<int>("CountryId")
                         .HasColumnType("int");
 
@@ -827,6 +830,9 @@ namespace Limak.Persistence.DAL.Migrations
                     b.Property<DateTime>("ModifiedTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("OperatorId")
+                        .HasColumnType("int");
+
                     b.Property<int>("RequestSubjectId")
                         .HasColumnType("int");
 
@@ -837,7 +843,11 @@ namespace Limak.Persistence.DAL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AppUserId");
+
                     b.HasIndex("CountryId");
+
+                    b.HasIndex("OperatorId");
 
                     b.HasIndex("RequestSubjectId");
 
@@ -1485,11 +1495,21 @@ namespace Limak.Persistence.DAL.Migrations
 
             modelBuilder.Entity("Limak.Domain.Entities.Request", b =>
                 {
+                    b.HasOne("Limak.Domain.Entities.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Limak.Domain.Entities.Country", "Country")
                         .WithMany()
                         .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Limak.Domain.Entities.AppUser", "Operator")
+                        .WithMany()
+                        .HasForeignKey("OperatorId");
 
                     b.HasOne("Limak.Domain.Entities.RequestSubject", "RequestSubject")
                         .WithMany()
@@ -1497,7 +1517,11 @@ namespace Limak.Persistence.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("AppUser");
+
                     b.Navigation("Country");
+
+                    b.Navigation("Operator");
 
                     b.Navigation("RequestSubject");
                 });

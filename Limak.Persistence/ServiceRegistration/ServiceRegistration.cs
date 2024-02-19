@@ -33,6 +33,7 @@ public static class ServiceRegistration
     {
         app.MapHub<NotificationHub>("/notificationHub");
         app.MapHub<ChatHub>("/chatHub");
+        app.MapHub<RequestHub>("/requestHub");
 
         return app;
     }
@@ -92,7 +93,8 @@ public static class ServiceRegistration
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<IMessageService, MessageService>();
         services.AddScoped<IRequestSubjectService, RequestSubjectService>();
-
+        services.AddScoped<IRequestService, RequestService>();
+        services.AddScoped<IRequestMessageService, RequestMessageService>();
     }
 
     private static void AddRepositories(IServiceCollection services)
@@ -117,6 +119,8 @@ public static class ServiceRegistration
         services.AddScoped<IChatRepository, ChatRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<IRequestSubjectRepository, RequestSubjectRepository>();
+        services.AddScoped<IRequestRepository, RequestRepository>();
+        services.AddScoped<IRequestMessageRepository, RequestMessageRepository>();
 
     }
     #endregion

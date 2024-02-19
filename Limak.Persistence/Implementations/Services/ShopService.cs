@@ -4,6 +4,7 @@ using Limak.Application.Abstractions.Services;
 using Limak.Application.DTOs.RepsonseDTOs;
 using Limak.Application.DTOs.ShopDTOs;
 using Limak.Domain.Entities;
+using Limak.Domain.Enums;
 using Limak.Persistence.Utilities.Exceptions.Common;
 using Limak.Persistence.Utilities.Helpers;
 using Microsoft.EntityFrameworkCore;
@@ -77,11 +78,11 @@ public class ShopService : IShopService
             throw new InvalidInputException();
 
         if (country is null || country is 0)
-            country = (await _countryService.FirstOrDefaultAsync()).Id;
+            country = (await _countryService.GetByNameAsync(CountryNames.Turkey)).Id;
 
 
         var query = _repository.GetFiltered(x => x.CountryId == country);
-        if (category is not null && category!=0)
+        if (category is not null && category != 0)
             query = query.Where(x => x.ShopCategories.Any(x => x.CategoryId == category));
 
         var shops = await _repository.Paginate(query, 12, page).ToListAsync();

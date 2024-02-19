@@ -67,6 +67,15 @@ public class CountryService : ICountryService
         return dto;
     }
 
+    public async Task<CountryGetDto> GetByNameAsync(string name)
+    {
+        var country=await _repository.GetSingleAsync(x=>x.Name==name);
+        if (country is null)
+            throw new NotFoundException($"{name} this country is not found");
+
+        var dto=_mapper.Map<CountryGetDto>(country);
+        return dto;
+    }
 
     public async Task<bool> IsExist(int id)
     {
@@ -95,5 +104,8 @@ public class CountryService : ICountryService
             throw new NotFoundException($"Country is not found({id})!");
         return country;
     }
+
+
+
 
 }
