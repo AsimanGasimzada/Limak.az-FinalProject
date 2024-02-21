@@ -1,4 +1,6 @@
-﻿namespace Limak.Application.DTOs.DeliveryDTOs;
+﻿using Limak.Domain.Entities;
+
+namespace Limak.Application.DTOs.DeliveryDTOs;
 
 public class DeliveryPostDto
 {

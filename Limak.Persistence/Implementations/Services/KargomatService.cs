@@ -59,7 +59,7 @@ public class KargomatService : IKargomatService
         return dto;
     }
 
-    public async Task<bool> IsExist(int id)
+    public async Task<bool> IsExistAsync(int id)
     {
         return await _repository.IsExistAsync(x => x.Id == id);
     }

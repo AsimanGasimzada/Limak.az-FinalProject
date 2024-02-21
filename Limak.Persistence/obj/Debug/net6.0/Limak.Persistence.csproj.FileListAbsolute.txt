@@ -17,3 +17,4 @@ C:\Users\DELL\source\repos\Limak\Limak.Persistence\obj\Debug\net6.0\refint\Limak
 C:\Users\DELL\source\repos\Limak\Limak.Persistence\obj\Debug\net6.0\Limak.Persistence.pdb
 C:\Users\DELL\source\repos\Limak\Limak.Persistence\obj\Debug\net6.0\Limak.Persistence.genruntimeconfig.cache
 C:\Users\DELL\source\repos\Limak\Limak.Persistence\obj\Debug\net6.0\ref\Limak.Persistence.dll
+C:\Users\DELL\source\repos\Limak\Limak.Persistence\obj\Debug\net6.0\Limak.Persistence.sourcelink.json

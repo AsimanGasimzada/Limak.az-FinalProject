@@ -47,12 +47,12 @@ public class NewsService : INewsService
 
 
 
-    public async Task<List<NewsGetDto>> GetAllAsync(int page = 1)
+    public async Task<List<NewsGetDto>> GetAllAsync(string? search, int page = 1)
     {
         if (page < 1)
             throw new InvalidInputException();
 
-        var query = _repository.GetAll();
+        var query = _repository.GetFiltered(p => !string.IsNullOrWhiteSpace(search) ? p.Subject.Contains(search) : true);
         var news = await _repository.Paginate(query, 12, page).ToListAsync();
         if (news.Count is 0)
             throw new NotFoundException("News not found!");

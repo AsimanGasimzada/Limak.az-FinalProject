@@ -3,4 +3,5 @@
 public class BalancePutDto
 {
     public decimal Amount { get; set; }
+    public List<int>? OrderIds { get; set; }
 }

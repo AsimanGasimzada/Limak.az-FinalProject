@@ -2,12 +2,13 @@
 using Limak.Application.DTOs.TransactionDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 namespace Limak.Presentation.Controllers;
 
 [Route("Transactions")]
 [ApiController]
-[Authorize(Roles ="Member")]
+[Authorize(Roles = "Member")]
 public class TransactionsController : ControllerBase
 {
     private readonly ITransactionService _service;
@@ -38,5 +39,15 @@ public class TransactionsController : ControllerBase
     public async Task<IActionResult> GetBalances()
     {
         return Ok(await _service.GetBalances());
+    }
+
+    [HttpGet("ExportExcel")]
+    public async Task<IActionResult> ExportToExcelAsync()
+    {
+        
+
+        var result = await _service.ExportToExcelAsync();
+
+        return File(result.FileContents, result.ConcentType, result.FileName);
     }
 }

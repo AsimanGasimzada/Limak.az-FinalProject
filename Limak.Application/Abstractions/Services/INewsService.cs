@@ -5,7 +5,7 @@ namespace Limak.Application.Abstractions.Services;
 
 public interface INewsService
 {
-    Task<List<NewsGetDto>> GetAllAsync(int page = 1);
+    Task<List<NewsGetDto>> GetAllAsync(string? search,int page = 1);
     Task<NewsGetDto> GetByIdAsync(int id);
     Task<ResultDto> CreateAsync(NewsPostDto dto);
     Task<ResultDto> UpdateAsync(NewsPutDto dto);

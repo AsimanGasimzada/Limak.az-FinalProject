@@ -132,7 +132,7 @@ public class ShopService : IShopService
 
         foreach (var id in deletedCategoryIds)
         {
-            await _shopCategoryService.RemoveAsync(existedShop.ShopCategories.FirstOrDefault(x => x.CategoryId == id).Id);
+            await _shopCategoryService.RemoveAsync(existedShop.ShopCategories.FirstOrDefault(x => x.CategoryId == id)?.Id ?? 0);
         }
         foreach (var id in createdCategoryIds)
         {

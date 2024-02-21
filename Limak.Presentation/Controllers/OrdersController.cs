@@ -1,6 +1,5 @@
 ﻿using Limak.Application.Abstractions.Services;
 using Limak.Application.DTOs.OrderDTOs;
-using Limak.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -67,6 +66,12 @@ public class OrdersController : ControllerBase
         return Ok(await _service.UpdateAsync(dto));
     }
 
+    [HttpPatch("[action]")]
+    public async Task<IActionResult> SetKargomat(OrderSetKargomatDto dto)
+    {
+        return Ok(await _service.SetKargomatAsync(dto));
+    }
+
 
 
 
@@ -93,8 +98,19 @@ public class OrdersController : ControllerBase
         return Ok(await _service.ChangeOrderStatusAsync(dto));
     }
 
+    [HttpPatch("[action]")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> OrderCancel(OrderCancelDto dto)
+    {
+        return Ok(await _service.OrderCancelAsync(dto));
+    }
 
 
 
+    [HttpPatch("[action]/{id}")]
+    public async Task<IActionResult> CancelKargomat([FromRoute] int id)
+    {
+        return Ok(await _service.CancelKargomatAsync(id));
+    }
 
 }

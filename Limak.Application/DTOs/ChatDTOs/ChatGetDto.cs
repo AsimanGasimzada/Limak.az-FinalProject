@@ -6,3 +6,11 @@ public class ChatGetDto
     public int OperatorId { get; set; }
     public bool IsActive { get; set; }
 }
+
+
+public class ChatRelationDto
+{
+    public int AppUserId { get; set; }
+    public int OperatorId { get; set; }
+    public bool IsActive { get; set; }
+}

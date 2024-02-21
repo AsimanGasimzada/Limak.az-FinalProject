@@ -23,4 +23,5 @@ public interface IAuthService
     Task<ResultDto> EditUserAccountDatas(AppUserAccountDataPutDto dto);
     Task<ResultDto> EditUserPersonalDatas(AppUserPersonalDataPutDto dto);
     Task<AccessToken> ChangeEmailAsync(ChangeEmailDto dto);
+    Task<string> GetUserRoleAsync(int AppUserId);
 }

@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using ClosedXML.Excel;
+using Limak.Application.Abstractions.Repositories;
 using Limak.Application.Abstractions.Services;
+using Limak.Application.DTOs.Common;
 using Limak.Application.DTOs.RepsonseDTOs;
 using Limak.Application.DTOs.TransactionDTOs;
 using Limak.Domain.Entities;
@@ -7,22 +10,27 @@ using Limak.Persistence.Utilities.Exceptions.Identity;
 using Limak.Persistence.Utilities.Exceptions.Transaction;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace Limak.Persistence.Implementations.Services;
 
 public class TransactionService : ITransactionService
 {
+    private readonly ITransactionRepository _repository;
     private readonly ICompanyService _companyService;
     private readonly UserManager<AppUser> _userManager;
+    private readonly IAuthService _authService;
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IMapper _mapper;
-    public TransactionService(ICompanyService companyService, UserManager<AppUser> userManager, IHttpContextAccessor contextAccessor, IMapper mapper)
+    public TransactionService(ICompanyService companyService, UserManager<AppUser> userManager, IHttpContextAccessor contextAccessor, IMapper mapper, ITransactionRepository repository, IAuthService authService)
     {
         _companyService = companyService;
         _userManager = userManager;
         _contextAccessor = contextAccessor;
         _mapper = mapper;
+        _repository = repository;
+        _authService = authService;
     }
 
     public async Task<GetBalanceDto> GetBalances()
@@ -39,6 +47,18 @@ public class TransactionService : ITransactionService
         user.AZNBalance += dto.Amount;
         await _userManager.UpdateAsync(user);
 
+        Transaction transaction = new()
+        {
+            AppUserId = user.Id,
+            UserBalance = user.AZNBalance,
+            Amount = dto.Amount,
+            IsPayment = false,
+            Feedback = "Increase AZN Balance"
+
+        };
+        await _repository.CreateAsync(transaction);
+        await _repository.SaveAsync();
+
         return new($"{user.Name} {user.Surname}-AZN Balance:{user.AZNBalance}");
     }
 
@@ -48,6 +68,19 @@ public class TransactionService : ITransactionService
 
         user.AZNBalance += dto.Amount;
         await _userManager.UpdateAsync(user);
+
+        Transaction transaction = new()
+        {
+            AppUserId = user.Id,
+            UserBalance = user.AZNBalance,
+            Amount = dto.Amount,
+            IsPayment = false,
+            Feedback = "RePayment AZN Balance"
+
+        };
+        await _repository.CreateAsync(transaction);
+        await _repository.SaveAsync();
+
 
         var company = await _companyService.GetCompanyAsync();
         company.AZNBalance -= dto.Amount;
@@ -63,6 +96,19 @@ public class TransactionService : ITransactionService
         user.TRYBalance += dto.Amount;
         await _userManager.UpdateAsync(user);
 
+        Transaction transaction = new()
+        {
+            AppUserId = user.Id,
+            UserBalance = user.TRYBalance,
+            Amount = dto.Amount,
+            IsPayment = false,
+            Feedback = $"Increase TRY Balance"
+
+        };
+        await _repository.CreateAsync(transaction);
+        await _repository.SaveAsync();
+
+
         return new($"{user.Name} {user.Surname}-TRY Balance:{user.TRYBalance}");
     }
 
@@ -72,6 +118,20 @@ public class TransactionService : ITransactionService
 
         user.TRYBalance += dto.Amount;
         await _userManager.UpdateAsync(user);
+
+
+        Transaction transaction = new()
+        {
+            AppUserId = user.Id,
+            UserBalance = user.TRYBalance,
+            Amount = dto.Amount,
+            IsPayment = false,
+            Feedback = $"Repayment TRY Balance"
+
+        };
+        await _repository.CreateAsync(transaction);
+        await _repository.SaveAsync();
+
 
         var company = await _companyService.GetCompanyAsync();
         company.TRYBalance -= dto.Amount;
@@ -87,6 +147,19 @@ public class TransactionService : ITransactionService
         user.USDBalance += dto.Amount;
         await _userManager.UpdateAsync(user);
 
+        Transaction transaction = new()
+        {
+            AppUserId = user.Id,
+            UserBalance = user.USDBalance,
+            Amount = dto.Amount,
+            IsPayment = false,
+            Feedback = $"Increase USD Balance"
+
+        };
+        await _repository.CreateAsync(transaction);
+        await _repository.SaveAsync();
+
+
         return new($"{user.Name} {user.Surname}-USD Balance:{user.USDBalance}");
     }
 
@@ -97,6 +170,20 @@ public class TransactionService : ITransactionService
 
         user.USDBalance += dto.Amount;
         await _userManager.UpdateAsync(user);
+
+        Transaction transaction = new()
+        {
+            AppUserId = user.Id,
+            UserBalance = user.AZNBalance,
+            Amount = dto.Amount,
+            IsPayment = false,
+            Feedback = $"Repayment USD Balance"
+
+        };
+        await _repository.CreateAsync(transaction);
+        await _repository.SaveAsync();
+
+
 
         var company = await _companyService.GetCompanyAsync();
         company.USDBalance -= dto.Amount;
@@ -113,6 +200,19 @@ public class TransactionService : ITransactionService
         user.AZNBalance -= dto.Amount;
         await _userManager.UpdateAsync(user);
 
+        Transaction transaction = new()
+        {
+            AppUserId = user.Id,
+            UserBalance = user.AZNBalance,
+            Amount = dto.Amount,
+            IsPayment = true,
+            Feedback = $"Payment AZN Balance"
+
+        };
+        await _repository.CreateAsync(transaction);
+        await _repository.SaveAsync();
+
+
         var company = await _companyService.GetCompanyAsync();
         company.AZNBalance += dto.Amount;
         await _companyService.UpdateCompanyAsync(company);
@@ -128,6 +228,20 @@ public class TransactionService : ITransactionService
 
         user.TRYBalance -= dto.Amount;
         await _userManager.UpdateAsync(user);
+
+
+        Transaction transaction = new()
+        {
+            AppUserId = user.Id,
+            UserBalance = user.TRYBalance,
+            Amount = dto.Amount,
+            IsPayment = true,
+            Feedback = $"Payment TRY Balance,Orders{string.Join(",", dto.OrderIds ?? new())}"
+        };
+
+        await _repository.CreateAsync(transaction);
+        await _repository.SaveAsync();
+
 
         var company = await _companyService.GetCompanyAsync();
         company.TRYBalance += dto.Amount;
@@ -146,6 +260,19 @@ public class TransactionService : ITransactionService
         user.USDBalance -= dto.Amount;
         await _userManager.UpdateAsync(user);
 
+        Transaction transaction = new()
+        {
+            AppUserId = user.Id,
+            UserBalance = user.TRYBalance,
+            Amount = dto.Amount,
+            IsPayment = true,
+            Feedback = $"Payment TRY Balance,Orders{string.Join(",", dto.OrderIds ?? new())}"
+        };
+
+        await _repository.CreateAsync(transaction);
+        await _repository.SaveAsync();
+
+
         var company = await _companyService.GetCompanyAsync();
         company.USDBalance += dto.Amount;
         await _companyService.UpdateCompanyAsync(company);
@@ -153,9 +280,59 @@ public class TransactionService : ITransactionService
         return new($"{user.Name} {user.Surname}-USD Balance:{user.USDBalance}-Payment is successfull!");
     }
 
+
+
+    public async Task<ExportExcelDto> ExportToExcelAsync()
+    {
+        var currentUser = await _authService.GetCurrentUserAsync();
+        var transactions = await _repository.GetFiltered(x => x.AppUserId == currentUser.Id, false, "AppUser").ToListAsync();
+
+
+
+        using (var workBook = new XLWorkbook())
+        {
+            IXLWorksheet worksheet = workBook.Worksheets.Add("Telebeler");
+            worksheet.Cell(1, 1).Value = "Id";
+            worksheet.Cell(1, 2).Value = "Date/Time";
+            worksheet.Cell(1, 3).Value = "Amount";
+            worksheet.Cell(1, 4).Value = "Feedback";
+            worksheet.Cell(1, 5).Value = "UserBalance";
+
+
+
+            worksheet.Column(1).Width = 20; 
+            worksheet.Column(2).Width = 40; 
+            worksheet.Column(3).Width = 20; 
+            worksheet.Column(4).Width = 100; 
+            worksheet.Column(5).Width = 40; 
+
+
+            for (int i = 0; i < transactions.Count; i++)
+            {
+                var transaction = transactions[i];
+
+                worksheet.Cell(i + 2, 1).Value = transaction.Id;
+                worksheet.Cell(i + 2, 2).Value = transaction.CreatedTime;
+                worksheet.Cell(i + 2, 3).Value = transaction.Amount;
+                worksheet.Cell(i + 2, 4).Value = transaction.Feedback;
+                worksheet.Cell(i + 2, 5).Value = transaction.UserBalance;
+
+
+            }
+
+            using (var stream = new MemoryStream())
+            {
+                workBook.SaveAs(stream);
+                var content = stream.ToArray();
+                return new() { FileContents = content, ConcentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", FileName = "Ödənişlər" };
+
+            }
+
+        }
+    }
     private async Task<AppUser> GetUser()
     {
-        var id = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var id = _contextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
         var user = await _userManager.FindByIdAsync(id);
         if (user is null)
             throw new UnAuthorizedException();

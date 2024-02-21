@@ -69,4 +69,18 @@ public class RequestService : IRequestService
 
         return new($"{dto.Id}-Request is successfully updated");
     }
+
+
+    public async Task<RequestGetDto> GetByIdAsync(int id)
+    {
+        var request = await _repository.GetSingleAsync(x=>x.Id==id);
+
+        if (request is null)
+            throw new NotFoundException($"{id}-This Request is not found");
+
+
+        var dto=_mapper.Map<RequestGetDto>(request);
+
+        return dto;
+    }
 }

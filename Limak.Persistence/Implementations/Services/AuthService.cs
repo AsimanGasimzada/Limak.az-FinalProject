@@ -139,6 +139,15 @@ public class AuthService : IAuthService
 
         return accessToken;
     }
+
+
+    public async Task<string> GetUserRoleAsync(int AppUserId)
+    {
+        var user = await _getUserById(AppUserId.ToString());
+        var roles = await _userManager.GetRolesAsync(user);
+        return roles.FirstOrDefault() ?? "null";
+    }
+
     public async Task<AccessToken> RefreshToken(string refreshToken)
     {
         var user = await _userManager.Users.FirstOrDefaultAsync(x => x.RefreshToken == refreshToken);

@@ -1,4 +1,6 @@
-﻿namespace Limak.Application.DTOs.OrderDTOs;
+﻿using Limak.Domain.Entities;
+
+namespace Limak.Application.DTOs.OrderDTOs;
 
 public class OrderCancelDto
 {

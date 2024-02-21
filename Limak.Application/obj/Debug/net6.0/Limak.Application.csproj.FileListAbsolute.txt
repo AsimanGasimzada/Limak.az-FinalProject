@@ -13,3 +13,4 @@ C:\Users\DELL\source\repos\Limak\Limak.Application\obj\Debug\net6.0\Limak.Applic
 C:\Users\DELL\source\repos\Limak\Limak.Application\obj\Debug\net6.0\refint\Limak.Application.dll
 C:\Users\DELL\source\repos\Limak\Limak.Application\obj\Debug\net6.0\Limak.Application.pdb
 C:\Users\DELL\source\repos\Limak\Limak.Application\obj\Debug\net6.0\ref\Limak.Application.dll
+C:\Users\DELL\source\repos\Limak\Limak.Application\obj\Debug\net6.0\Limak.Application.sourcelink.json

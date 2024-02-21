@@ -10,6 +10,6 @@ public interface IKargomatService
     Task<KargomatGetDto> GetByIdAsync(int id);
     Task<ResultDto> CreateAsync(KargomatPostDto dto);
     Task<ResultDto> UpdateAsync(KargomatPutDto dto);
-    Task<bool> IsExist(int id);
+    Task<bool> IsExistAsync(int id);
     Task<ResultDto> DeleteAsync(int id);
 }

@@ -9,4 +9,5 @@ public interface IRequestService
     Task<ResultDto> UpdateAsync(RequestPutDto dto);
     Task<List<RequestGetDto>> GetUsersAllRequestsAsync();
     Task<List<RequestGetDto>> GetAllAsync();
+    Task<RequestGetDto> GetByIdAsync(int id);
 }

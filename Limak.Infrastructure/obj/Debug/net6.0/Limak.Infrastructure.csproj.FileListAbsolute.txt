@@ -15,3 +15,4 @@ C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\obj\Debug\net6.0\Limak.Inf
 C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\obj\Debug\net6.0\refint\Limak.Infrastructure.dll
 C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\obj\Debug\net6.0\Limak.Infrastructure.pdb
 C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\obj\Debug\net6.0\ref\Limak.Infrastructure.dll
+C:\Users\DELL\source\repos\Limak\Limak.Infrastructure\obj\Debug\net6.0\Limak.Infrastructure.sourcelink.json

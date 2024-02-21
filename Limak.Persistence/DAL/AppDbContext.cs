@@ -50,5 +50,7 @@ public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int>
     public DbSet<Request> Requests { get; set; } = null!;
     public DbSet<RequestMessage> RequestMessages { get; set; } = null!;
     public DbSet<RequestSubject> RequestSubjects { get; set; } = null!;
+    public DbSet<Transaction>Transactions  { get; set; } = null!;
+    public DbSet<Setting> Settings  { get; set; } = null!;
 
 }

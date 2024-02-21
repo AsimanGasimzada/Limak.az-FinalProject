@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Limak.Presentation")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6b2f6bf1fa8bf594d94181e18822cf91db43a9b8")]
 [assembly: System.Reflection.AssemblyProductAttribute("Limak.Presentation")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Limak.Presentation")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

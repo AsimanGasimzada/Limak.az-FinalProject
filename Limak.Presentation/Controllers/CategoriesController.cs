@@ -1,14 +1,11 @@
 ﻿using Limak.Application.Abstractions.Services;
 using Limak.Application.DTOs.CategoryDTOs;
-using Limak.Application.DTOs.ShopDTOs;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Limak.Presentation.Controllers;
 
 [Route("categories")]
 [ApiController]
-[Authorize]
 public class CategoriesController : ControllerBase
 {
     private readonly ICategoryService _service;

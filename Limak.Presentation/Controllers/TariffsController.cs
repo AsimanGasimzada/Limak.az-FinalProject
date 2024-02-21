@@ -15,6 +15,14 @@ public class TariffsController : ControllerBase
         _service = service;
     }
 
+
+
+    [HttpPost]
+    public async Task<IActionResult> CreateAsync(TariffPostDto dto)
+    {
+        return Ok(await _service.CreateAsync(dto)); 
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {

@@ -121,6 +121,7 @@ public static class ServiceRegistration
         services.AddScoped<IRequestSubjectRepository, RequestSubjectRepository>();
         services.AddScoped<IRequestRepository, RequestRepository>();
         services.AddScoped<IRequestMessageRepository, RequestMessageRepository>();
+        services.AddScoped<ITransactionRepository, TransactionRepository>();
 
     }
     #endregion

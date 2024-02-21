@@ -17,9 +17,9 @@ public class NewsController : ControllerBase
 
 
     [HttpGet]
-    public async Task<IActionResult> GetAllAsync()
+    public async Task<IActionResult> GetAllAsync([FromQuery] string? search,int page=1)
     {
-        return Ok(await _service.GetAllAsync());
+        return Ok(await _service.GetAllAsync(search,page));
     }
     [HttpGet("{id}")]
     public async Task<IActionResult> GetByIdAsync([FromRoute] int id)
