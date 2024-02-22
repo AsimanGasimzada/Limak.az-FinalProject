@@ -14,14 +14,16 @@ public interface IAuthService
     Task<AccessToken> ChangePasswordAsync(ChangePasswordDto dto);
     Task<AppUserGetDto> GetCurrentUserAsync();
     Task<ResultDto> SendForgetPasswordMail(ForgetPasswordDto dto);
-    Task<AppUserGetDto> CheckResetPasswordToken(ForgetPasswordTokenDto dto);
     Task<AccessToken> ResetPasswordAsync(ResetPasswordTokenDto dto);
-    Task<AppUserGetDto> GetUserByIdAsync(int id);
-    Task<List<AppUserGetDto>> GetAllUsersAsync();
     Task<List<AppUserGetDto>> GetAllModeratorsAsync();
 
     Task<ResultDto> EditUserAccountDatas(AppUserAccountDataPutDto dto);
     Task<ResultDto> EditUserPersonalDatas(AppUserPersonalDataPutDto dto);
     Task<AccessToken> ChangeEmailAsync(ChangeEmailDto dto);
     Task<string> GetUserRoleAsync(int AppUserId);
+    Task<ResultDto> ChangeUserRoleAsync(ChangeRoleDto dto);
+    Task<AppUserGetDto> GetUserByIdAsync(int id);
+    Task<AppUserGetDto> GetUserByUsernameAsync(string userName);
+    Task<List<AppUserGetDto>> GetAllUsersAsync();
+    Task<AppUserGetDto> CheckResetPasswordToken(ForgetPasswordTokenDto dto);
 }

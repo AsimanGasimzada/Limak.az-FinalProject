@@ -29,7 +29,7 @@ public class TariffService : ITariffService
         if (!isExistCountry)
             throw new NotFoundException($"{dto.CountryId}-Country is not found!");
 
-        var isExist = await _repository.IsExistAsync(x => !(x.MaxValue <= dto.MinValue || x.MinValue >= dto.MaxValue));
+        var isExist = await _repository.IsExistAsync(x => !(x.MaxValue <= dto.MinValue || x.MinValue >= dto.MaxValue) && x.CountryId==dto.CountryId);
         if (isExist)
             throw new AlreadyExistException("this range is already exist");
 
@@ -101,5 +101,17 @@ public class TariffService : ITariffService
 
         return new($"{existedTariff.Id}-Tarif is successfully edited");
 
+    }
+
+
+
+    public async Task<TariffGetDto> GetTariffByWeight(decimal weight, int countryId)
+    {
+        var tariff=await _repository.GetSingleAsync(x=>x.MinValue<=weight && x.MaxValue>=weight && x.CountryId==countryId);
+        if (tariff is null)
+            throw new NotFoundException($"{weight}-Tariff is not found");
+        var dto = _mapper.Map<TariffGetDto>(tariff);
+
+        return dto;
     }
 }

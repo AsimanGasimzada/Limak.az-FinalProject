@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Office2016.Drawing.Command;
 using Limak.Application.Abstractions.Repositories;
 using Limak.Application.Abstractions.Services;
 using Limak.Application.DTOs.Common;
@@ -210,7 +211,7 @@ public class TransactionService : ITransactionService
 
         };
         await _repository.CreateAsync(transaction);
-        await _repository.SaveAsync();
+        //çağırıldığı yerdə save olunmalıdır
 
 
         var company = await _companyService.GetCompanyAsync();
@@ -240,8 +241,7 @@ public class TransactionService : ITransactionService
         };
 
         await _repository.CreateAsync(transaction);
-        await _repository.SaveAsync();
-
+        //çağırıldığı yerdə save olunmalıdır
 
         var company = await _companyService.GetCompanyAsync();
         company.TRYBalance += dto.Amount;
@@ -270,7 +270,7 @@ public class TransactionService : ITransactionService
         };
 
         await _repository.CreateAsync(transaction);
-        await _repository.SaveAsync();
+        //çağırıldığı yerdə save olunmalıdır
 
 
         var company = await _companyService.GetCompanyAsync();
@@ -285,13 +285,13 @@ public class TransactionService : ITransactionService
     public async Task<ExportExcelDto> ExportToExcelAsync()
     {
         var currentUser = await _authService.GetCurrentUserAsync();
-        var transactions = await _repository.GetFiltered(x => x.AppUserId == currentUser.Id, false, "AppUser").ToListAsync();
+        var transactions = await _repository.GetFiltered(x => x.AppUserId == currentUser.Id, false, "AppUser").OrderByDescending(x => x.Id) .ToListAsync();
 
 
 
         using (var workBook = new XLWorkbook())
-        {   
-            IXLWorksheet worksheet = workBook.Worksheets.Add("Telebeler");
+        {
+            IXLWorksheet worksheet = workBook.Worksheets.Add("Ödənişlər");
             worksheet.Cell(1, 1).Value = "Id";
             worksheet.Cell(1, 2).Value = "Date/Time";
             worksheet.Cell(1, 3).Value = "Amount";
@@ -300,11 +300,11 @@ public class TransactionService : ITransactionService
 
 
 
-            worksheet.Column(1).Width = 8; 
+            worksheet.Column(1).Width = 8;
             worksheet.Column(2).Width = 20;
-            worksheet.Column(3).Width = 8; 
-            worksheet.Column(4).Width = 40; 
-            worksheet.Column(5).Width = 20; 
+            worksheet.Column(3).Width = 8;
+            worksheet.Column(4).Width = 40;
+            worksheet.Column(5).Width = 20;
 
 
             for (int i = 0; i < transactions.Count; i++)
@@ -330,6 +330,16 @@ public class TransactionService : ITransactionService
 
         }
     }
+
+    public async Task<List<TransactionGetDto>> GetAllTransactions()
+    {
+        var currentUser = await _authService.GetCurrentUserAsync();
+        var transactions = await _repository.GetFiltered(x => x.AppUserId == currentUser.Id, false, "AppUser").OrderByDescending(x => x.Id).ToListAsync();
+
+        var dtos = _mapper.Map<List<TransactionGetDto>>(transactions);
+        return dtos;
+    }
+
     private async Task<AppUser> GetUser()
     {
         var id = _contextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);

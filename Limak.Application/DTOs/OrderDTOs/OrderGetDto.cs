@@ -25,6 +25,10 @@ public class OrderGetDto
     public string Notes { get; set; } = null!;
     public decimal AdditionFees { get; set; } = 0;
     public string? AdditionFeesNotes { get; set; }
+    public decimal OrderTotalPrice { get; set; }
+    public decimal TotalPrice { get; set; } = 0;
+    public bool IsCancel { get; set; } = false;
+    public string? CancellationNotes { get; set; }
     //
     public int AppUserId { get; set; }
     public AppUserRelationDto AppUser { get; set; } = null!;

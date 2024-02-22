@@ -4,11 +4,11 @@ using Limak.Application.Abstractions.Repositories;
 using Limak.Application.Abstractions.Services;
 using Limak.Application.DTOs.OrderDTOs;
 using Limak.Application.DTOs.RepsonseDTOs;
+using Limak.Application.Validators.AuthValidators;
 using Limak.Domain.Entities;
 using Limak.Domain.Enums;
 using Limak.Persistence.Utilities.Exceptions.Common;
 using Limak.Persistence.Utilities.Exceptions.Identity;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Limak.Persistence.Implementations.Services;
@@ -17,7 +17,6 @@ public class OrderService : IOrderService
 {
     private readonly IOrderRepository _repository;
     private readonly IMapper _mapper;
-    private readonly IHttpContextAccessor _contextAccessor;
     private readonly ICountryService _countryService;
     private readonly IAuthService _authService;
     private readonly IWarehouseService _warehouseService;
@@ -26,11 +25,11 @@ public class OrderService : IOrderService
     private readonly IEmailHelper _emailHelper;
     private readonly INotificationService _notificationService;
     private readonly IKargomatService _kargomatService;
-    public OrderService(IOrderRepository repository, IMapper mapper, IHttpContextAccessor contextAccessor, ICountryService countryService, IWarehouseService warehouseService, IStatusService statusService, ITransactionService transactionService, IEmailHelper emailHelper, INotificationService noNotificationService, IAuthService authService, IKargomatService kargomatService)
+    private readonly ITariffService _tariffService;
+    public OrderService(IOrderRepository repository, IMapper mapper, ICountryService countryService, IWarehouseService warehouseService, IStatusService statusService, ITransactionService transactionService, IEmailHelper emailHelper, INotificationService noNotificationService, IAuthService authService, IKargomatService kargomatService, ITariffService tariffService)
     {
         _repository = repository;
         _mapper = mapper;
-        _contextAccessor = contextAccessor;
         _countryService = countryService;
         _warehouseService = warehouseService;
         _statusService = statusService;
@@ -39,6 +38,7 @@ public class OrderService : IOrderService
         _notificationService = noNotificationService;
         _authService = authService;
         _kargomatService = kargomatService;
+        _tariffService = tariffService;
     }
 
     public async Task<ResultDto> CreateAsync(OrderPostDto dto)
@@ -53,8 +53,19 @@ public class OrderService : IOrderService
             throw new NotFoundException($"{dto.WarehouseId}-This Warehouse is not found!");
 
         var order = _mapper.Map<Order>(dto);
-        order.TotalPrice = (decimal)(order.Price * order.Count) + order.LocalCargoPrice;
-        order.TotalPrice = order.TotalPrice * 1.05m;
+        order.OrderTotalPrice = (order.Price * order.Count) + order.LocalCargoPrice;
+
+        var turkey = await _countryService.GetByNameAsync(CountryNames.Turkey);
+        var america = await _countryService.GetByNameAsync(CountryNames.America);
+
+        if (order.CountryId == turkey.Id)
+            order.TotalPrice = order.TotalPrice * 1.05m;
+
+        if (order.CountryId == america.Id)
+            order.TotalPrice = order.TotalPrice * 1.07m;
+
+
+
         order.AppUserId = user.Id;
         order.StatusId = (await _statusService.GetByNameAsync(StatusNames.NotOrdered)).Id;
 
@@ -97,7 +108,7 @@ public class OrderService : IOrderService
     public async Task<List<OrderGetDto>> GetNotPaymentOrders()
     {
         var user = await _authService.GetCurrentUserAsync();
-        var orders = await _repository.GetFiltered(x => x.AppUserId == user.Id && x.Status.Name == StatusNames.NotOrdered, false, "AppUser", "Status", "Country").ToListAsync();
+        var orders = await _repository.GetFiltered(x => x.AppUserId == user.Id && x.Status.Name == StatusNames.NotOrdered, false, "AppUser", "Status", "Country", "Warehouse", "Kargomat", "Delivery", "Shop").ToListAsync();
         if (orders.Count is 0)
             throw new NotFoundException("Order is not found!");
 
@@ -107,7 +118,7 @@ public class OrderService : IOrderService
     public async Task<List<OrderGetDto>> GetUserAllOrders()
     {
         var user = await _authService.GetCurrentUserAsync();
-        var orders = await _repository.GetFiltered(x => x.AppUserId == user.Id, false, "AppUser", "Status", "Country").ToListAsync();
+        var orders = await _repository.GetFiltered(x => x.AppUserId == user.Id, false, "AppUser", "Status", "Country", "Warehouse", "Kargomat", "Delivery", "Shop").ToListAsync();
         if (orders.Count is 0)
             throw new NotFoundException("Order is not found!");
 
@@ -135,7 +146,7 @@ public class OrderService : IOrderService
         orders.ForEach(x => { if (x.AppUserId != user.Id || x.Country != country || x.Status.Name != StatusNames.NotOrdered) throw new InvalidInputException($"{x.Id}-This Order not found"); });
 
         decimal totalPrice = 0;
-        orders.ForEach(x => totalPrice += x.TotalPrice);
+        orders.ForEach(x => totalPrice += x.OrderTotalPrice);
 
         if (country?.Name == CountryNames.Turkey)
             await _transactionService.PaymentByTRYBalance(new() { Amount = totalPrice, OrderIds = orderIds });
@@ -148,12 +159,61 @@ public class OrderService : IOrderService
         orders.ForEach(x =>
         {
             x.StatusId = paidStatus.Id;
+            x.OrderPaymentStatus = true;
             _repository.Update(x);
         });
 
         await _repository.SaveAsync();
 
         return new($"Payment is successfully Total-{totalPrice}");
+    }
+    public async Task<ResultDto> PayFullOrder(int orderId)
+    {
+        var user = await _authService.GetCurrentUserAsync();
+        var order = await _getOrder(orderId);
+
+
+        if (order.AppUserId != user.Id)
+            throw new NotFoundException($"{orderId}-Order is not found");
+
+        var status1 = await _statusService.GetByNameAsync(StatusNames.ForeignWarehouse);
+        var status2 = await _statusService.GetByNameAsync(StatusNames.Customs);
+        var status3 = await _statusService.GetByNameAsync(StatusNames.OnTheWay);
+        var status4 = await _statusService.GetByNameAsync(StatusNames.LocalWarehouse);
+        var status5 = await _statusService.GetByNameAsync(StatusNames.Kargomat);
+        var status6 = await _statusService.GetByNameAsync(StatusNames.Delivery);
+
+
+        if (order.StatusId != status1.Id && order.StatusId != status2.Id && order.StatusId != status3.Id && order.StatusId != status4.Id && order.StatusId != status5.Id && order.StatusId != status6.Id)
+            throw new NotFoundException($"{orderId}-Order is not found");
+
+        if (order.OrderPaymentStatus && order.CargoPaymentStatus)
+            throw new NotFoundException($"{orderId}-Order is not found");
+
+        if (order.Country.Name == CountryNames.Turkey)
+        {
+            await _transactionService.PaymentByAZNBalance(new() { Amount = order.TotalPrice, OrderIds = new() { orderId } });
+
+            if (!order.OrderPaymentStatus)
+                await _transactionService.PaymentByTRYBalance(new() { Amount = order.OrderTotalPrice, OrderIds = new() { orderId } });
+
+
+        }
+
+        if (order.Country.Name == CountryNames.America)
+        {
+            await _transactionService.PaymentByAZNBalance(new() { Amount = order.TotalPrice, OrderIds = new() { orderId } });
+
+            if (!order.OrderPaymentStatus)
+                await _transactionService.PaymentByUSDBalance(new() { Amount = order.OrderTotalPrice, OrderIds = new() { orderId } });
+        }
+        order.CargoPaymentStatus = true;
+        order.OrderPaymentStatus = true;
+
+        _repository.Update(order);
+        await _repository.SaveAsync();
+
+        return new($"{order.Id}-order is payment is done");
     }
     public async Task<ResultDto> UpdateAsync(OrderPutDto dto)
     {
@@ -211,9 +271,11 @@ public class OrderService : IOrderService
 
         existed = _mapper.Map(dto, existed);
 
-        existed.TotalPrice = (decimal)(existed.Price * existed.Count) + existed.LocalCargoPrice + existed.AdditionFees;
-        existed.TotalPrice = existed.TotalPrice * 1.05m;
-        existed.StatusId = (await _statusService.GetByNameAsync(StatusNames.Ordered)).Id;
+        var tariff = await _tariffService.GetTariffByWeight(dto.Weight, existed.CountryId);
+        existed.CargoPrice = tariff.Price;
+        existed.TotalPrice = existed.AdditionFees + tariff.Price;
+        existed.StatusId = (await _statusService.GetByNameAsync(StatusNames.ForeignWarehouse)).Id;
+
 
 
         _repository.Update(existed);
@@ -296,6 +358,55 @@ public class OrderService : IOrderService
 
         return new("Kargomat is successfully created");
     }
+    public async Task<ResultDto> CreateByAdminAsync(OrderAdminPostDto dto)
+    {
+
+        var user = await _authService.GetUserByUsernameAsync(dto.UserName);
+
+        var isExistCountry = await _countryService.IsExist(dto.CountryId);
+        if (!isExistCountry)
+            throw new NotFoundException($"{dto.CountryId}-This Country is not found!");
+
+        var isExistWarehouse = await _warehouseService.IsExist(dto.WarehouseId);
+        if (!isExistWarehouse)
+            throw new NotFoundException($"{dto.WarehouseId}-This Warehouse is not found!");
+
+        var order = _mapper.Map<Order>(dto);
+
+        var tariff = await _tariffService.GetTariffByWeight(dto.Weight, dto.CountryId);
+        var status = await _statusService.GetByNameAsync(StatusNames.ForeignWarehouse);
+
+
+
+        order.CargoPrice = tariff.Price;
+        order.AppUserId = user.Id;
+        order.OrderTotalPrice = dto.LocalCargoPrice + (dto.Price * order.Count);
+
+        var turkey = await _countryService.GetByNameAsync(CountryNames.Turkey);
+        var america = await _countryService.GetByNameAsync(CountryNames.America);
+
+        if (order.CountryId == turkey.Id)
+            order.OrderTotalPrice = order.OrderTotalPrice * 1.05m;
+
+        if (order.CountryId == america.Id)
+            order.OrderTotalPrice = order.OrderTotalPrice * 1.07m;
+
+        order.TotalPrice = tariff.Price;
+        order.StatusId = status.Id;
+
+
+
+        await _repository.CreateAsync(order);
+        await _repository.SaveAsync();
+
+        await _notificationService.CreateAsync(new() { AppUserId = order.AppUserId, Subject = "Xarici anbara bağlamanız daxil olub", Title = $" sifarişiniz {status.Name}-mərhələsinə keçdi,zəhmət olmasa SmartCustomsda bəyan edin." });
+
+
+        return new("Order is successfully created");
+
+    }
+
+
     private async Task<Order> _getOrder(int id)
     {
         var order = await _repository.GetSingleAsync(x => x.Id == id, false, "Status", "AppUser", "Country");

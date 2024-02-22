@@ -10,5 +10,6 @@ public class OrderAdminPutDtoValidator : AbstractValidator<OrderAdminPutDto>
         RuleFor(x => x.Id).GreaterThan(0).NotNull();
         RuleFor(x => x.AdditionFeesNotes).MaximumLength(256);
         RuleFor(x => x.AdditionFees).NotNull();
+        RuleFor(x => x.AdditionFees).NotNull().GreaterThan(0);
     }
 }

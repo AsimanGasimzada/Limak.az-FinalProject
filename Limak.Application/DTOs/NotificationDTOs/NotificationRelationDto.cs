@@ -7,5 +7,7 @@ public class NotificationRelationDto
     public string Title { get; set; } = null!;
     public int AppUserId { get; set; }
     public DateTime CreatedTime { get; set; }
+    public bool IsRead { get; set; }
+
 
 }

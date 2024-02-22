@@ -34,6 +34,11 @@ public class TransactionsController : ControllerBase
         return Ok(await _service.IncreaseTRYBalance(dto));
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetAllAsync()
+    {
+        return Ok(await _service.GetAllTransactions());
+    }
 
     [HttpGet("[action]")]
     public async Task<IActionResult> GetBalances()
@@ -44,7 +49,7 @@ public class TransactionsController : ControllerBase
     [HttpGet("ExportExcel")]
     public async Task<IActionResult> ExportToExcelAsync()
     {
-        
+
 
         var result = await _service.ExportToExcelAsync();
 

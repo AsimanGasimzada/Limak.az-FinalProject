@@ -41,6 +41,15 @@ public class OrdersController : ControllerBase
         return Ok(await _service.PayOrders(orderIds));
     }
 
+
+    [HttpPost("[action]/{id}")]
+    [Authorize(Roles = "Member")]
+    public async Task<IActionResult> PayOrder([FromRoute]int id)
+    {
+        return Ok(await _service.PayFullOrder(id));
+    }
+
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetByIdAsync([FromRoute] int id)
     {
@@ -78,28 +87,28 @@ public class OrdersController : ControllerBase
     //Admin
 
     [HttpGet("[action]")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Moderator")]
     public async Task<IActionResult> GetAllAdminAsync()
     {
         return Ok(await _service.GetAllAsync());
     }
 
     [HttpPut("[action]")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Moderator")]
     public async Task<IActionResult> PutOrderAdminAsync(OrderAdminPutDto dto)
     {
         return Ok(await _service.UpdateOrderByAdminAsync(dto));
     }
 
     [HttpPatch("[action]")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Moderator")]
     public async Task<IActionResult> ChangeOrderStatusAsync(OrderChangeStatusDto dto)
     {
         return Ok(await _service.ChangeOrderStatusAsync(dto));
     }
 
     [HttpPatch("[action]")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Moderator")]
     public async Task<IActionResult> OrderCancel(OrderCancelDto dto)
     {
         return Ok(await _service.OrderCancelAsync(dto));
@@ -113,4 +122,11 @@ public class OrdersController : ControllerBase
         return Ok(await _service.CancelKargomatAsync(id));
     }
 
+
+    [HttpPost("[action]")]
+    [Authorize(Roles ="Admin,Moderator")]
+    public async Task<IActionResult> CreateByAdmin(OrderAdminPostDto dto)
+    {
+        return Ok(await _service.CreateByAdminAsync(dto));
+    }
 }

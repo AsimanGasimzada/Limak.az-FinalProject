@@ -129,6 +129,26 @@ public class AuthController : ControllerBase
     }
 
 
+    [HttpGet("[action]/{id}")]
+    [Authorize(Roles ="Admin")]
+    public async Task<IActionResult> GetUserById([FromRoute]int id)
+    {
+        return Ok(await _service.GetUserByIdAsync(id));
+    }
 
+
+    [HttpGet("[action]")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetAllUsers()
+    {
+        return Ok(await _service.GetAllUsersAsync());
+    }
+
+    [HttpPut("[action]")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ChangeUserRole(ChangeRoleDto dto)
+    {
+        return Ok(await _service.ChangeUserRoleAsync(dto));
+    }
 
 }

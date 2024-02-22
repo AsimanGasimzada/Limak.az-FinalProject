@@ -14,6 +14,7 @@ public interface ITransactionService
     Task<ResultDto> PaymentByTRYBalance(BalancePutDto dto);
     Task<ResultDto> PaymentByUSDBalance(BalancePutDto dto);
     Task<GetBalanceDto> GetBalances();
+    Task<List<TransactionGetDto>> GetAllTransactions();
     Task<ExportExcelDto> ExportToExcelAsync();
     Task<ResultDto> IncreaseAZNBalanceAdmin(BalanceAdminPutDto dto);
     Task<ResultDto> IncreaseTRYBalanceAdmin(BalanceAdminPutDto dto);

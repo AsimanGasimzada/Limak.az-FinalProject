@@ -16,6 +16,7 @@ public interface IOrderService
     Task<bool> IsExistAsync(int id);
     Task<ResultDto> DeleteAsync(int id);
     Task<ResultDto> PayOrders(List<int> orderIds);
+    Task<ResultDto> PayFullOrder(int orderId);
     Task<ResultDto> UpdateOrderByAdminAsync(OrderAdminPutDto dto);
     Task<ResultDto> ChangeOrderStatusAsync(OrderChangeStatusDto dto);
     Task<ResultDto> OrderCancelAsync(OrderCancelDto dto);
@@ -23,4 +24,5 @@ public interface IOrderService
     Task<ResultDto> CancelDelivery(Delivery delivery);
     Task<ResultDto> SetKargomatAsync(OrderSetKargomatDto dto);
     Task<ResultDto> CancelKargomatAsync(int orderId);
+    Task<ResultDto> CreateByAdminAsync(OrderAdminPostDto dto);
 }

@@ -139,15 +139,12 @@ public class AuthService : IAuthService
 
         return accessToken;
     }
-
-
     public async Task<string> GetUserRoleAsync(int AppUserId)
     {
         var user = await _getUserById(AppUserId.ToString());
         var roles = await _userManager.GetRolesAsync(user);
         return roles.FirstOrDefault() ?? "null";
     }
-
     public async Task<AccessToken> RefreshToken(string refreshToken)
     {
         var user = await _userManager.Users.FirstOrDefaultAsync(x => x.RefreshToken == refreshToken);
@@ -205,6 +202,8 @@ public class AuthService : IAuthService
 
         var dto = _mapper.Map<AppUserGetDto>(user);
 
+        dto.Role = await GetUserRoleAsync(dto.Id);
+
         return dto;
     }
     public async Task<ResultDto> SendForgetPasswordMail(ForgetPasswordDto dto)
@@ -240,6 +239,10 @@ public class AuthService : IAuthService
     {
         var users = await _userManager.Users.ToListAsync();
         var dtos = _mapper.Map<List<AppUserGetDto>>(users);
+
+        foreach (var dto in dtos)
+            dto.Role = await GetUserRoleAsync(dto.Id);
+
         return dtos;
     }
     public async Task<List<AppUserGetDto>> GetAllModeratorsAsync()
@@ -340,7 +343,43 @@ public class AuthService : IAuthService
         return new("User successfully updated");
 
     }
+    public async Task<ResultDto> ChangeUserRoleAsync(ChangeRoleDto dto)
+    {
+        var user = await _userManager.FindByIdAsync(dto.AppUserId.ToString());
+        if (user is null)
+            throw new NotFoundException($"{dto.AppUserId}-this user is not found");
 
+        var role = await _roleManager.FindByNameAsync(dto.Role);
+        if (role is null)
+            throw new NotFoundException($"{dto.Role}-this role is not found");
+        var existRole = await GetUserRoleAsync(dto.AppUserId);
+
+        var existClaims = await _userManager.GetClaimsAsync(user);
+
+        var result = await _userManager.AddToRoleAsync(user, role.Name);
+        if (!result.Succeeded)
+            throw new InvalidInputException();
+        result = await _userManager.RemoveFromRoleAsync(user, existRole);
+        if (!result.Succeeded)
+            throw new InvalidInputException();
+
+
+        await _userManager.RemoveClaimsAsync(user, existClaims);
+
+        var newClaims = await ClaimsCreateAsync(user);
+        await _userManager.AddClaimsAsync(user, newClaims);
+
+        return new($"{user.UserName}-User's role is successfully changed");
+    }
+    public async Task<AppUserGetDto> GetUserByUsernameAsync(string userName)
+    {
+        var user = await _userManager.FindByNameAsync(userName);
+        if (user is null)
+            throw new NotFoundException($"{userName}-User is not found!");
+
+        var dto=_mapper.Map<AppUserGetDto>(user);
+        return dto;
+    }
 
     private async Task<AppUser> _getUserById(string id)
     {

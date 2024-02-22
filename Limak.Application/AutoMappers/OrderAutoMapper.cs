@@ -13,5 +13,6 @@ public class OrderAutoMapper:Profile
         CreateMap<Order, OrderAdminPutDto>().ReverseMap();
         CreateMap<Order, OrderGetDto>().ReverseMap();
         CreateMap<Order, OrderRelationDto>().ReverseMap();
+        CreateMap<Order, OrderAdminPostDto>().ReverseMap();
     }
 }

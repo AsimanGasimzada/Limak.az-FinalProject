@@ -757,6 +757,9 @@ namespace Limak.Persistence.DAL.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
+                    b.Property<decimal>("OrderTotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("OrderURL")
                         .IsRequired()
                         .HasMaxLength(1028)
