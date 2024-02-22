@@ -4,5 +4,6 @@ namespace Limak.Domain.Entities;
 
 public class RequestSubject : BaseEntity
 {
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
+    public ICollection<Request> Requests { get; set; } = new List<Request>();
 }

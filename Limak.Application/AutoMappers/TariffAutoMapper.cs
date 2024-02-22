@@ -11,5 +11,6 @@ public class TariffAutoMapper : Profile
         CreateMap<Tariff, TariffGetDto>().ReverseMap();
         CreateMap<Tariff, TariffPutDto>().ReverseMap();
         CreateMap<Tariff, TariffPostDto>().ReverseMap();
+        CreateMap<Tariff, TariffRelationDto>().ReverseMap();
     }
 }

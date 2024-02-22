@@ -1,4 +1,6 @@
-﻿namespace Limak.Application.DTOs.TransactionDTOs;
+﻿using Limak.Application.DTOs.AuthDTOs;
+
+namespace Limak.Application.DTOs.TransactionDTOs;
 
 public class TransactionGetDto
 {
@@ -7,4 +9,5 @@ public class TransactionGetDto
     public string Feedback { get; set; } = null!;
     public decimal UserBalance { get; set; }
     public int AppUserId { get; set; }
+    public AppUserRelationDto AppUser { get; set; } = null!;
 }

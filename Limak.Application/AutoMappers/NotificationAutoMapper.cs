@@ -10,6 +10,8 @@ public class NotificationAutoMapper:Profile
     {
         CreateMap<Notification, NotificationGetDto>().ReverseMap();
         CreateMap<Notification, NotificationPostDto>().ReverseMap();
+        CreateMap<Notification, NotificationRelationDto>().ReverseMap();
+
             
     }
 }

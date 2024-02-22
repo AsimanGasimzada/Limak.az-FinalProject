@@ -11,5 +11,6 @@ public class DeliveryAreaAutoMapper:Profile
         CreateMap<DeliveryArea, DeliveryAreaGetDto>().ReverseMap();
         CreateMap<DeliveryArea, DeliveryAreaPostDto>().ReverseMap();
         CreateMap<DeliveryArea, DeliveryAreaPutDto>().ReverseMap();
+        CreateMap<DeliveryArea, DeliveryAreaRelationDto>().ReverseMap();
     }
 }

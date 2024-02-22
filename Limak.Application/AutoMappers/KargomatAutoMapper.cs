@@ -11,5 +11,6 @@ public class KargomatAutoMapper:Profile
         CreateMap<Kargomat, KargomatGetDto>().ReverseMap();
         CreateMap<Kargomat, KargomatPostDto>().ReverseMap();
         CreateMap<Kargomat, KargomatPutDto>().ReverseMap();
+        CreateMap<Kargomat, KargomatRelationDto>().ReverseMap();
     }
 }

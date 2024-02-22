@@ -46,7 +46,7 @@ public class DeliveryAreaService:IDeliveryAreaService
 
     public async Task<List<DeliveryAreaGetDto>> GetAllAsync()
     {
-        var DeliveryAreas = await _repository.GetAll().ToListAsync();
+        var DeliveryAreas = await _repository.GetAll(false,"Warehouse").ToListAsync();
 
         if (DeliveryAreas.Count is 0)
             throw new NotFoundException("DeliveryArea is not found");
@@ -84,7 +84,7 @@ public class DeliveryAreaService:IDeliveryAreaService
 
     private async Task<DeliveryArea> _getDeliveryArea(int id)
     {
-        var DeliveryArea = await _repository.GetSingleAsync(x => x.Id == id);
+        var DeliveryArea = await _repository.GetSingleAsync(x => x.Id == id,false, "Warehouse");
         if (DeliveryArea is null)
             throw new NotFoundException($"This DeliveryArea is not found({id})!");
         return DeliveryArea;

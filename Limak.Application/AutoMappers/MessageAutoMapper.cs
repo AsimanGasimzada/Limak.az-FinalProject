@@ -10,5 +10,6 @@ public class MessageAutoMapper:Profile
     {
         CreateMap<Message, MessagePostDto>().ReverseMap();
         CreateMap<Message, MessageGetDto>().ReverseMap();
+        CreateMap<Message, MessageRelationDto>().ReverseMap();
     }
 }

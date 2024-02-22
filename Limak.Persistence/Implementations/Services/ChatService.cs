@@ -5,6 +5,7 @@ using Limak.Application.DTOs.ChatDTOs;
 using Limak.Application.DTOs.RepsonseDTOs;
 using Limak.Domain.Entities;
 using Limak.Persistence.Utilities.Exceptions.Common;
+using Limak.Persistence.Utilities.Exceptions.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Limak.Persistence.Implementations.Services;
@@ -72,11 +73,15 @@ public class ChatService : IChatService
         return await _repository.IsExistAsync(x => x.Id == id);
     }
 
-    public async Task<ResultDto> SetOperatorAsync(ChatPutOperatorDto dto)
+    public async Task<ResultDto> SetOperatorAsync(int chatId)
     {
-        var chat = await _getChatById(dto.Id);
+        var chat = await _getChatById(chatId);
 
-        var user = await _authService.GetUserByIdAsync(dto.OperatorId);
+        var user = await _authService.GetCurrentUserAsync();
+        var role = await _authService.GetUserRoleAsync(user.Id);
+
+        if (role is "Member")
+            throw new UnAuthorizedException("A member cannot be an operator");
 
         chat.OperatorId = user.Id;
 
@@ -106,7 +111,7 @@ public class ChatService : IChatService
     public async Task<ChatGetDto> GetOnlineChatAsync()
     {
         var user = await _authService.GetCurrentUserAsync();
-        var chat = await _repository.GetSingleAsync(x => x.AppUserId == user.Id);
+        var chat = await _repository.GetSingleAsync(x => x.AppUserId == user.Id, false, "AppUser","Operator","Messages");
         if (chat is null)
         {
             await CreateAsync();
@@ -121,7 +126,7 @@ public class ChatService : IChatService
 
     private async Task<Chat> _getChatById(int id)
     {
-        var chat = await _repository.GetSingleAsync(x => x.Id == id);
+        var chat = await _repository.GetSingleAsync(x => x.Id == id,false,"Operator","AppUser","Messages");
         if (chat is null)
             throw new NotFoundException($"{id}-Chat is not found");
         return chat;

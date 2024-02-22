@@ -13,4 +13,5 @@ public class Request : BaseAuditableEntity
     public AppUser? Operator { get; set; } 
     public int? OperatorId { get; set; }
     public bool? Status { get; set; } = false;
+    public ICollection<RequestMessage> RequestMessages{ get; set; }=new List<RequestMessage>();
 }

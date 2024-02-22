@@ -11,5 +11,6 @@ public class RequestSubjectAutoMapper : Profile
         CreateMap<RequestSubject, RequestSubjectGetDto>().ReverseMap();
         CreateMap<RequestSubject, RequestSubjectPostDto>().ReverseMap();
         CreateMap<RequestSubject, RequestSubjectPutDto>().ReverseMap();
+        CreateMap<RequestSubject, RequestSubjectRelationDto>().ReverseMap();
     }
 }

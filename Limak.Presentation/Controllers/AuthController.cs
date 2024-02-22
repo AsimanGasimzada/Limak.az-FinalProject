@@ -17,6 +17,21 @@ public class AuthController : ControllerBase
     }
 
 
+    #region onlyDevelopment
+    [HttpGet("[action]")]
+    public async Task<IActionResult> GetAdminToken()
+    {
+        return Ok(await _service.LoginAsync(new() {Email="admin@gmail.com",Password="Admin2003" }));
+    }
+
+    [HttpGet("[action]")]
+    public async Task<IActionResult> GetMemberToken()
+    {
+        return Ok(await _service.LoginAsync(new() { Email = "asimanjg@code.edu.az", Password = "Admin2003" }));
+    }
+    #endregion
+
+
 
     [HttpGet("[action]")]
     [Authorize]

@@ -9,5 +9,7 @@ public class TransactionAutoMapper:Profile
     public TransactionAutoMapper()
     {
         CreateMap<AppUser, GetBalanceDto>().ReverseMap();
+        CreateMap<Transaction,TransactionRelationDto >().ReverseMap();
+        CreateMap<Transaction,TransactionGetDto >().ReverseMap();
     }
 }

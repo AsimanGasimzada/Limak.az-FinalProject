@@ -81,7 +81,7 @@ public class ShopService : IShopService
             country = (await _countryService.GetByNameAsync(CountryNames.Turkey)).Id;
 
 
-        var query = _repository.GetFiltered(x => x.CountryId == country);
+        var query = _repository.GetFiltered(x => x.CountryId == country,false, "ShopCategories.Category");
         if (category is not null && category != 0)
             query = query.Where(x => x.ShopCategories.Any(x => x.CategoryId == category));
 

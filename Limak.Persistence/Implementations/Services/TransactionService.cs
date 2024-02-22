@@ -290,7 +290,7 @@ public class TransactionService : ITransactionService
 
 
         using (var workBook = new XLWorkbook())
-        {
+        {   
             IXLWorksheet worksheet = workBook.Worksheets.Add("Telebeler");
             worksheet.Cell(1, 1).Value = "Id";
             worksheet.Cell(1, 2).Value = "Date/Time";
@@ -300,11 +300,11 @@ public class TransactionService : ITransactionService
 
 
 
-            worksheet.Column(1).Width = 20; 
-            worksheet.Column(2).Width = 40; 
-            worksheet.Column(3).Width = 20; 
-            worksheet.Column(4).Width = 100; 
-            worksheet.Column(5).Width = 40; 
+            worksheet.Column(1).Width = 8; 
+            worksheet.Column(2).Width = 20;
+            worksheet.Column(3).Width = 8; 
+            worksheet.Column(4).Width = 40; 
+            worksheet.Column(5).Width = 20; 
 
 
             for (int i = 0; i < transactions.Count; i++)

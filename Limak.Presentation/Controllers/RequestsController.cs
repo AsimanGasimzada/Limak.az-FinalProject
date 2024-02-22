@@ -16,28 +16,46 @@ public class RequestsController : ControllerBase
     {
         _service = service;
     }
+
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetByIdAsync(int id)
+    {
+        return Ok(await _service.GetByIdAsync(id));
+    }
+
     [HttpPost]
     [Authorize(Roles = "Member")]
     public async Task<IActionResult> CreateAsync(RequestPostDto dto)
     {
         return Ok(await _service.CreateAsync(dto));
     }
+
     [HttpGet]
     [Authorize(Roles = "Member")]
     public async Task<IActionResult> GetAllAsync()
     {
         return Ok(await _service.GetUsersAllRequestsAsync());
     }
+
     [HttpGet("[action]")]
-    [Authorize(Roles = "Admin,Member")]
+    [Authorize(Roles = "Admin,Moderator")]
     public async Task<IActionResult> GetAllAdmin()
     {
         return Ok(await _service.GetAllAsync());
     }
-    [HttpPatch]
-    [Authorize(Roles = "Admin,Member")]
-    public async Task<IActionResult> UpdateAsync(RequestPutDto dto)
+
+    [HttpPatch("[action]")]
+    [Authorize(Roles = "Admin,Moderator")]
+    public async Task<IActionResult> ChangeStatus(RequestPutDto dto)
     {
         return Ok(await _service.UpdateAsync(dto));
+    }
+
+    [HttpPatch("[action]/{requestId}")]
+    [Authorize(Roles = "Admin,Moderator")]
+    public async Task<IActionResult> SetupOperator([FromRoute] int requestId)
+    {
+        return Ok(await _service.SetOperatorAsync(requestId));
     }
 }

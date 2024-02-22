@@ -12,5 +12,6 @@ public class AuthAutoMapper : Profile
         CreateMap<AppUser, AppUserGetDto>().ReverseMap();
         CreateMap<AppUser, AppUserAccountDataPutDto>().ForMember(dest => dest.Email, opt => opt.Ignore()).ReverseMap();
         CreateMap<AppUser, AppUserPersonalDataPutDto>().ReverseMap();
+        CreateMap<AppUser, AppUserRelationDto>().ReverseMap();
     }
 }

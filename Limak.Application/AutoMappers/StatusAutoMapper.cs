@@ -11,5 +11,6 @@ public class StatusAutoMapper:Profile
         CreateMap<Status, StatusGetDto>().ReverseMap();
         CreateMap<Status, StatusPostDto>().ReverseMap();
         CreateMap<Status, StatusPutDto>().ReverseMap();
+        CreateMap<Status, StatusRelationDto>().ReverseMap();
     }
 }

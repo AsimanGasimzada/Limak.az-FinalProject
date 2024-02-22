@@ -9,9 +9,9 @@ public class Shop:BaseAuditableEntity
     public string WebsitePath { get; set; }
     public Country Country { get; set; }
     public int CountryId { get; set; }
-    public ICollection<ShopCategory> ShopCategories { get; set; }
+    public ICollection<ShopCategory> ShopCategories { get; set; }=new List<ShopCategory>();
 
-    public ICollection<Order> Orders { get; set; }
+    public ICollection<Order> Orders { get; set; } = new List<Order>();
 
 
 }

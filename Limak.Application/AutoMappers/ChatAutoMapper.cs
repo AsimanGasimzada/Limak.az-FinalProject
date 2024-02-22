@@ -10,6 +10,7 @@ public class ChatAutoMapper : Profile
     {
         CreateMap<Chat, ChatGetDto>().ReverseMap();
         CreateMap<Chat, ChatPutDto>().ReverseMap();
+        CreateMap<Chat, ChatRelationDto>().ReverseMap();
 
     }
 }

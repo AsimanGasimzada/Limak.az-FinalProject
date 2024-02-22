@@ -360,6 +360,9 @@ namespace Limak.Persistence.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("AppUserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -413,6 +416,8 @@ namespace Limak.Persistence.DAL.Migrations
                         .HasColumnType("nvarchar(128)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
 
                     b.HasIndex("DeliveryAreaId");
 
@@ -1462,11 +1467,19 @@ namespace Limak.Persistence.DAL.Migrations
 
             modelBuilder.Entity("Limak.Domain.Entities.Delivery", b =>
                 {
+                    b.HasOne("Limak.Domain.Entities.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Limak.Domain.Entities.DeliveryArea", "DeliveryArea")
                         .WithMany("Deliveries")
                         .HasForeignKey("DeliveryAreaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("AppUser");
 
                     b.Navigation("DeliveryArea");
                 });
@@ -1584,7 +1597,7 @@ namespace Limak.Persistence.DAL.Migrations
                         .HasForeignKey("OperatorId");
 
                     b.HasOne("Limak.Domain.Entities.RequestSubject", "RequestSubject")
-                        .WithMany()
+                        .WithMany("Requests")
                         .HasForeignKey("RequestSubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1607,7 +1620,7 @@ namespace Limak.Persistence.DAL.Migrations
                         .IsRequired();
 
                     b.HasOne("Limak.Domain.Entities.Request", "Request")
-                        .WithMany()
+                        .WithMany("RequestMessages")
                         .HasForeignKey("RequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1755,6 +1768,16 @@ namespace Limak.Persistence.DAL.Migrations
             modelBuilder.Entity("Limak.Domain.Entities.Kargomat", b =>
                 {
                     b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("Limak.Domain.Entities.Request", b =>
+                {
+                    b.Navigation("RequestMessages");
+                });
+
+            modelBuilder.Entity("Limak.Domain.Entities.RequestSubject", b =>
+                {
+                    b.Navigation("Requests");
                 });
 
             modelBuilder.Entity("Limak.Domain.Entities.Shop", b =>

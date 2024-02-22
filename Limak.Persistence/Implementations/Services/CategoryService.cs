@@ -55,7 +55,7 @@ public class CategoryService : ICategoryService
 
     public async Task<List<CategoryGetDto>> GetAllAsync()
     {
-        var categories = await _repository.GetAll().ToListAsync();
+        var categories = await _repository.GetAll(includes:"ShopCategories.Shop").ToListAsync();
         var dtos = _mapper.Map<List<CategoryGetDto>>(categories);
         return dtos;
     }
@@ -93,7 +93,7 @@ public class CategoryService : ICategoryService
 
     private async Task<Category> _getCategory(int id)
     {
-        var category = await _repository.GetSingleAsync(x => x.Id == id);
+        var category = await _repository.GetSingleAsync(x => x.Id == id,false, "ShopCategories.Shop");
         if (category is null)
             throw new NotFoundException($"Category not found({id})!");
         return category;

@@ -8,6 +8,6 @@ public class Kargomat : BaseAuditableEntity
     public string Position { get; set; }
     public decimal Price { get; set; }
 
-    public ICollection<Order> Orders { get; set; }
+    public ICollection<Order> Orders { get; set; }=new List<Order>();
 
 }

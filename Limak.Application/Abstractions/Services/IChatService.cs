@@ -9,7 +9,7 @@ public interface IChatService
 
     Task<bool> IsExistAsync(int id);
     Task<ResultDto> UpdateAsync(ChatPutDto dto);
-    Task<ResultDto> SetOperatorAsync(ChatPutOperatorDto dto);
+    Task<ResultDto> SetOperatorAsync(int chatId);
     Task<ChatGetDto> GetByIdAsync(int id);
     Task<List<ChatGetDto>> GetAll();
     Task<ChatGetDto> GetOnlineChatAsync();

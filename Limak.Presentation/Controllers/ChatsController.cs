@@ -53,10 +53,10 @@ public class ChatsController : ControllerBase
     }
 
 
-    [HttpPut("[action]")]
+    [HttpPut("[action]/{id}")]
     [Authorize(Roles = "Admin,Moderator")]
-    public async Task<IActionResult> SetOperator(ChatPutOperatorDto dto)
+    public async Task<IActionResult> SetOperator([FromRoute]int id)
     {
-        return Ok(await _service.SetOperatorAsync(dto));
+        return Ok(await _service.SetOperatorAsync(id));
     }
 }

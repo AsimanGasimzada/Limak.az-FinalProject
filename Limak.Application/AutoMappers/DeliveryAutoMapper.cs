@@ -9,5 +9,7 @@ public class DeliveryAutoMapper:Profile
     public DeliveryAutoMapper()
     {
         CreateMap<Delivery, DeliveryPostDto>().ReverseMap();
+        CreateMap<Delivery, DeliveryGetDto>().ReverseMap();
+        CreateMap<Delivery, DeliveryRelationDto>().ReverseMap();
     }
 }

@@ -16,6 +16,22 @@ public class DeliveriesController : ControllerBase
     {
         _service = service;
     }
+    [HttpGet]
+    public async Task<IActionResult> GetAllAsync()
+    {
+        return Ok(await _service.GetAllAsync());
+    }
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetByIdAsync([FromRoute]int id)
+    {
+        return Ok(await _service.GetByIdAsync(id));
+    }
+    [HttpGet("[action]")]
+    [Authorize(Roles = "Admin,Moderator")]
+    public async Task<IActionResult> GetAllAdmin([FromQuery] int page = 1)
+    {
+        return Ok(await _service.GetAllAdminAsync(page));
+    }
 
 
     [HttpPost]

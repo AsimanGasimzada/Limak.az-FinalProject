@@ -11,5 +11,6 @@ public class WarehouseAutoMapper:Profile
         CreateMap<Warehouse, WarehouseGetDto>().ReverseMap();
         CreateMap<Warehouse, WarehousePostDto>().ReverseMap();
         CreateMap<Warehouse, WarehousePutDto>().ReverseMap();
+        CreateMap<Warehouse, WarehouseRelationDto>().ReverseMap();
     }
 }
