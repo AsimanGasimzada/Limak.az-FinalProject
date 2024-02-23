@@ -44,7 +44,7 @@ public class CategoryService : ICategoryService
     {
         Category category = await _getCategory(id);
 
-        _repository.HardDelete(category);
+        _repository.SoftDelete(category);
         await _repository.SaveAsync();
         await _cloudinaryService.FileDeleteAsync(category.ImagePath);
 
@@ -67,6 +67,29 @@ public class CategoryService : ICategoryService
         return dto;
     }
 
+    public async Task<List<CategoryGetDto>> GetTrash()
+    {
+        var categories = await _repository.GetFiltered(x => x.IsDeleted, true, "ShopCategories.Shop").ToListAsync();
+        if (categories.Count is 0)
+            throw new NotFoundException("Trash is empty");
+
+        var dtos=_mapper.Map<List<CategoryGetDto>>(categories);
+
+        return dtos;
+    }
+
+
+    public async Task<ResultDto> RepairDelete(int id)
+    {
+        var category=await _repository.GetSingleAsync(x=>x.Id == id,true);
+        if(category is null)
+            throw new NotFoundException($"{id}-category is not found");
+
+        _repository.Repair(category);
+        await _repository.SaveAsync();
+
+        return new($"{category.Name}-Category is successfully repair");
+    }
     public async Task<bool> IsExistAsync(int id)
     {
         return await _repository.IsExistAsync(x => x.Id == id);

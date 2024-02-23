@@ -1,5 +1,6 @@
 using Limak.Application.ServiceRegistration;
 using Limak.Infrastructure.ServiceRegistration;
+using Limak.Persistence.ContextInitializers;
 using Limak.Persistence.ServiceRegistration;
 using Limak.Presentation.Extensions;
 
@@ -22,9 +23,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+app.ContextInitalize();
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");
-//app.AddExceptionHandlerService();
+app.AddExceptionHandlerService();
 app.UseAuthentication();
 app.UseAuthorization();
 

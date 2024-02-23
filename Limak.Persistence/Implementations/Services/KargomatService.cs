@@ -42,7 +42,7 @@ public class KargomatService : IKargomatService
 
     public async Task<List<KargomatGetDto>> GetAllAsync()
     {
-        var Kargomats = await _repository.GetAll().ToListAsync();
+        var Kargomats = await _repository.GetAll(false).ToListAsync();
 
         if (Kargomats.Count is 0)
             throw new NotFoundException("Kargomat is not found");
@@ -75,9 +75,38 @@ public class KargomatService : IKargomatService
         return new($"{existedKargomat.Location}-Kargomat is successfully updated");
     }
 
+
+
+
+
+
+    public async Task<List<KargomatGetDto>> GetTrash()
+    {
+        var kargomats = await _repository.GetFiltered(x => x.IsDeleted, true, "Orders").ToListAsync();
+        if (kargomats.Count is 0)
+            throw new NotFoundException("Trash is empty");
+
+        var dtos = _mapper.Map<List<KargomatGetDto>>(kargomats);
+
+        return dtos;
+    }
+
+
+    public async Task<ResultDto> RepairDelete(int id)
+    {
+        var kargomat = await _repository.GetSingleAsync(x => x.Id == id, true);
+        if (kargomat is null)
+            throw new NotFoundException($"{id}-DeliveryArea is not found");
+
+        _repository.Repair(kargomat);
+        await _repository.SaveAsync();
+
+        return new($"{kargomat.Location}-Kargomat is successfully repair");
+    }
+
     private async Task<Kargomat> _getKargomat(int id)
     {
-        var Kargomat = await _repository.GetSingleAsync(x => x.Id == id);
+        var Kargomat = await _repository.GetSingleAsync(x => x.Id == id,false, "Orders");
         if (Kargomat is null)
             throw new NotFoundException($"This Kargomat is not found({id})!");
         return Kargomat;

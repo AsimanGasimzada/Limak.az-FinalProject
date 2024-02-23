@@ -7,7 +7,7 @@ public class OrderChangeStatusDtoValidator : AbstractValidator<OrderChangeStatus
 {
     public OrderChangeStatusDtoValidator()
     {
-        RuleFor(x => x.Id).NotNull();
+        RuleFor(x => x.Id).NotNull().GreaterThan(0);
         RuleFor(x => x.StatusId).NotNull();
     }
 

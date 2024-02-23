@@ -1,5 +1,6 @@
 ﻿using Limak.Application.Abstractions.Services;
 using Limak.Application.DTOs.CategoryDTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Limak.Presentation.Controllers;
@@ -27,6 +28,7 @@ public class CategoriesController : ControllerBase
         return Ok(await _service.GetByIdAsync(id));
     }
     [HttpPost]
+    [Authorize(Roles = "Admin,Moderator")]
     public async Task<IActionResult> CreateAsync([FromForm] CategoryPostDto dto)
     {
 
@@ -34,16 +36,32 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin,Moderator")]
     public async Task<IActionResult> DeleteAsync([FromRoute] int id)
     {
 
         return Ok(await _service.DeleteAsync(id));
     }
     [HttpPut]
+    [Authorize(Roles = "Admin,Moderator")]
     public async Task<IActionResult> UpdateAsync([FromForm] CategoryPutDto dto)
     {
 
         return Ok(await _service.UpdateAsync(dto));
     }
 
+    [HttpGet("[action]")]
+    [Authorize(Roles ="Admin,Moderator")]
+    public async Task<IActionResult> GetTrash()
+    {
+        return Ok(await _service.GetTrash());   
+    }
+
+
+    [HttpPatch("[action]/{id}")]
+    [Authorize(Roles = "Admin,Moderator")]
+    public async Task<IActionResult> RepairDelete(int id)
+    {
+        return Ok(await _service.RepairDelete(id));
+    }
 }

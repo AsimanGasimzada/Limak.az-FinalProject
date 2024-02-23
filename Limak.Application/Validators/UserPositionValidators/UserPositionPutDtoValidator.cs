@@ -7,7 +7,7 @@ public class UserPositionPutDtoValidator:AbstractValidator<UserPositionPutDto>
 {
     public UserPositionPutDtoValidator()
     {
-        RuleFor(x => x.Id).NotNull();
+        RuleFor(x => x.Id).NotNull().GreaterThan(0);
         RuleFor(x => x.Name).NotNull().MaximumLength(64).MinimumLength(3);
 
     }

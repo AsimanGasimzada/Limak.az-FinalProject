@@ -1,6 +1,7 @@
 ﻿using Limak.Application.Abstractions.Services;
 using Limak.Application.DTOs.CitizenshipDTOs;
 using Limak.Application.DTOs.CountryDTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Limak.Presentation.Controllers;
@@ -27,19 +28,15 @@ public class CitizenshipsController : ControllerBase
         return Ok(await _service.GetByIdAsync(id));
     }
     [HttpPost]
+    [Authorize(Roles = "Admin,Moderator")]
     public async Task<IActionResult> CreateAsync([FromForm] CitizenshipPostDto dto)
     {
 
         return Ok(await _service.CreateAsync(dto));
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAsync([FromRoute] int id)
-    {
-
-        return Ok(await _service.DeleteAsync(id));
-    }
     [HttpPut]
+    [Authorize(Roles = "Admin,Moderator")]
     public async Task<IActionResult> UpdateAsync([FromForm] CitizenshipPutDto dto)
     {
 

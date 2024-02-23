@@ -6,4 +6,5 @@ namespace Limak.Application.Abstractions.Services;
 public interface IPaymentService
 {
     Task<ResultDto> PayAsync(StripePayDto dto);
+    string GetPublishableKey();
 }

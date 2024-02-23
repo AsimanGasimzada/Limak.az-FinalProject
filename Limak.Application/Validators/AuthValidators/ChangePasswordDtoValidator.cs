@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Limak.Application.Validators.AuthValidators;
 
-public class ChangePasswordDtoValidator:AbstractValidator<ChangePasswordDto>
+public class ChangePasswordDtoValidator : AbstractValidator<ChangePasswordDto>
 {
     public ChangePasswordDtoValidator()
     {

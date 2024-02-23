@@ -18,10 +18,10 @@ public class RegisterDtoValidator : AbstractValidator<RegisterDto>
         RuleFor(x => x.FinCode).NotNull().MaximumLength(7).MinimumLength(7);
         RuleFor(x => x.Birtday).NotNull();
         RuleFor(x => x.Location).NotNull().MaximumLength(128).MinimumLength(3);
-        RuleFor(x => x.GenderId).NotNull();
-        RuleFor(x => x.CitizenshipId).NotNull();
-        RuleFor(x => x.UserPositionId).NotNull();
-        RuleFor(x => x.WarehouseId).NotNull();
+        RuleFor(x => x.GenderId).NotNull().GreaterThan(0);
+        RuleFor(x => x.CitizenshipId).NotNull().GreaterThan(0);
+        RuleFor(x => x.UserPositionId).NotNull().GreaterThan(0);
+        RuleFor(x => x.WarehouseId).NotNull().GreaterThan(0);
 
 
     }

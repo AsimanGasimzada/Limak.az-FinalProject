@@ -2,7 +2,6 @@
 using Limak.Application.Abstractions.Repositories;
 using Limak.Application.Abstractions.Services;
 using Limak.Application.DTOs.CitizenshipDTOs;
-using Limak.Application.DTOs.CitizenshipDTOs;
 using Limak.Application.DTOs.RepsonseDTOs;
 using Limak.Domain.Entities;
 using Limak.Persistence.Utilities.Exceptions.Common;
@@ -81,6 +80,19 @@ public class CitizenshipService : ICitizenshipService
         await _repository.SaveAsync();
 
         return new($"{existedCitizenship.Name}-Citizenship is successfully updated");
+    }
+
+
+    public async Task<CitizenshipGetDto> FirstOrDefault()
+    {
+        var citizenship = await _repository.GetSingleAsync(x => x.Id > 0, true);
+        if (citizenship is null)
+            throw new NotFoundException($"citizenship is not found");
+
+
+        var dto = _mapper.Map<CitizenshipGetDto>(citizenship);
+
+        return dto;
     }
 
 

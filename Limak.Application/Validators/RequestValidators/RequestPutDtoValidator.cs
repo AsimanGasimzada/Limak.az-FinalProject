@@ -7,7 +7,7 @@ public class RequestPutDtoValidator : AbstractValidator<RequestPutDto>
 {
     public RequestPutDtoValidator()
     {
-        RuleFor(x => x.Id).NotNull();
+        RuleFor(x => x.Id).NotNull().GreaterThan(0);
         RuleFor(x => x.Status).NotEmpty();
     }
 }

@@ -65,6 +65,7 @@ public class ShopService : IShopService
     public async Task<ResultDto> DeleteAsync(int id)
     {
         var shop = await _getShop(id);
+
         _repository.HardDelete(shop);
         await _cloudinaryService.FileDeleteAsync(shop.ImagePath);
         await _repository.SaveAsync();

@@ -7,7 +7,7 @@ public class WarehousePutDtoValidator:AbstractValidator<WarehousePutDto>
 {
     public WarehousePutDtoValidator()
     {
-        RuleFor(x => x.Id).NotNull();
+        RuleFor(x => x.Id).NotNull().GreaterThan(0);
         RuleFor(x => x.Name).NotNull().MaximumLength(128).MinimumLength(3);
         RuleFor(x => x.Location).NotNull().MaximumLength(128).MinimumLength(3);
         RuleFor(x => x.Position).NotNull().MaximumLength(128).MinimumLength(3);

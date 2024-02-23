@@ -3,6 +3,7 @@ using Limak.Application.Abstractions.Repositories;
 using Limak.Application.Abstractions.Services;
 using Limak.Application.DTOs.GenderDTOs;
 using Limak.Application.DTOs.RepsonseDTOs;
+using Limak.Application.DTOs.WarehouseDTOs;
 using Limak.Domain.Entities;
 using Limak.Persistence.Utilities.Exceptions.Common;
 using Microsoft.EntityFrameworkCore;
@@ -83,6 +84,18 @@ public class GenderService:IGenderService
         return new($"{existedGender.Name}-Gender is successfully updated");
     }
 
+
+    public async Task<GenderGetDto> FirstOrDefault()
+    {
+        var gender = await _repository.GetSingleAsync(x => x.Id > 0, true);
+        if (gender is null)
+            throw new NotFoundException($"gender is not found");
+
+
+        var dto = _mapper.Map<GenderGetDto>(gender);
+
+        return dto;
+    }
 
     private async Task<Gender> _getGender(int id)
     {

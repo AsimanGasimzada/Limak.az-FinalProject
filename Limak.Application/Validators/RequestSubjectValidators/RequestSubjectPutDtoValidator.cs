@@ -7,7 +7,7 @@ public class RequestSubjectPutDtoValidator : AbstractValidator<RequestSubjectPut
 {
     public RequestSubjectPutDtoValidator()
     {
-        RuleFor(x => x.Id).NotNull();
+        RuleFor(x => x.Id).NotNull().GreaterThan(0);
         RuleFor(x => x.Name).NotNull().MaximumLength(128).MinimumLength(3);
     }
 }

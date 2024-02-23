@@ -2,7 +2,7 @@
 
 public class ChangePasswordDto
 {
-    public string ExistPassword { get; set; }
-    public string NewPassword { get; set; }
-    public string ConfirmNewPassword { get; set; }
+    public string ExistPassword { get; set; } = null!;
+    public string NewPassword { get; set; }=null!;
+    public string ConfirmNewPassword { get; set; }=null !;
 }

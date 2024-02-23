@@ -11,7 +11,7 @@ public class ShopPostDtoValidator:AbstractValidator<ShopPostDto>
         RuleFor(x=>x.Image).NotNull();
         RuleFor(x=>x.WebsitePath).NotNull().MaximumLength(512).MinimumLength(1);
         RuleFor(x=>x.CategoryIds).NotNull();
-        RuleFor(x => x.CountryId).NotNull();
+        RuleFor(x => x.CountryId).NotNull().GreaterThan(0);
 
 
     }

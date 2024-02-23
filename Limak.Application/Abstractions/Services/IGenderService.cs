@@ -11,4 +11,5 @@ public interface IGenderService
     Task<ResultDto> UpdateAsync(GenderPutDto dto);
     Task<bool> IsExist(int id);
     Task<ResultDto> DeleteAsync(int id);
+    Task<GenderGetDto> FirstOrDefault();
 }

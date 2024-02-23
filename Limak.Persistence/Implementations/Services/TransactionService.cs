@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Office2016.Drawing.Command;
 using Limak.Application.Abstractions.Repositories;
 using Limak.Application.Abstractions.Services;
 using Limak.Application.DTOs.Common;
 using Limak.Application.DTOs.RepsonseDTOs;
+using Limak.Application.DTOs.StripeDTOs;
 using Limak.Application.DTOs.TransactionDTOs;
 using Limak.Domain.Entities;
 using Limak.Persistence.Utilities.Exceptions.Identity;
@@ -23,8 +23,10 @@ public class TransactionService : ITransactionService
     private readonly UserManager<AppUser> _userManager;
     private readonly IAuthService _authService;
     private readonly IHttpContextAccessor _contextAccessor;
+    private readonly IPaymentService _paymentService;
     private readonly IMapper _mapper;
-    public TransactionService(ICompanyService companyService, UserManager<AppUser> userManager, IHttpContextAccessor contextAccessor, IMapper mapper, ITransactionRepository repository, IAuthService authService)
+
+    public TransactionService(ICompanyService companyService, UserManager<AppUser> userManager, IHttpContextAccessor contextAccessor, IMapper mapper, ITransactionRepository repository, IAuthService authService, IPaymentService paymentService)
     {
         _companyService = companyService;
         _userManager = userManager;
@@ -32,6 +34,7 @@ public class TransactionService : ITransactionService
         _mapper = mapper;
         _repository = repository;
         _authService = authService;
+        _paymentService = paymentService;
     }
 
     public async Task<GetBalanceDto> GetBalances()
@@ -40,13 +43,15 @@ public class TransactionService : ITransactionService
         var dto = _mapper.Map<GetBalanceDto>(user);
         return dto;
     }
-
-    public async Task<ResultDto> IncreaseAZNBalance(BalancePutDto dto)
+    public async Task<ResultDto> IncreaseAZNBalance(StripePayDto dto)
     {
         var user = await GetUser();
 
+
         user.AZNBalance += dto.Amount;
+        await _paymentService.PayAsync(dto);
         await _userManager.UpdateAsync(user);
+
 
         Transaction transaction = new()
         {
@@ -54,15 +59,60 @@ public class TransactionService : ITransactionService
             UserBalance = user.AZNBalance,
             Amount = dto.Amount,
             IsPayment = false,
-            Feedback = "Increase AZN Balance"
+            Feedback = "Balans artımı AZN"
 
         };
         await _repository.CreateAsync(transaction);
         await _repository.SaveAsync();
 
-        return new($"{user.Name} {user.Surname}-AZN Balance:{user.AZNBalance}");
+        return new($"{user.Name} {user.Surname}-AZN Balance:{user.AZNBalance}₼");
     }
+    public async Task<ResultDto> IncreaseUSDBalance(StripePayDto dto)
+    {
+        var user = await GetUser();
 
+        user.USDBalance += dto.Amount;
+        await _paymentService.PayAsync(dto);
+        await _userManager.UpdateAsync(user);
+
+        Transaction transaction = new()
+        {
+            AppUserId = user.Id,
+            UserBalance = user.USDBalance,
+            Amount = dto.Amount,
+            IsPayment = false,
+            Feedback = $"Balans artımı USD"
+
+        };
+        await _repository.CreateAsync(transaction);
+        await _repository.SaveAsync();
+
+
+        return new($"{user.Name} {user.Surname}-USD Balance:{user.USDBalance}$");
+    }
+    public async Task<ResultDto> IncreaseTRYBalance(StripePayDto dto)
+    {
+        var user = await GetUser();
+
+        user.TRYBalance += dto.Amount;
+        await _paymentService.PayAsync(dto);
+        await _userManager.UpdateAsync(user);
+
+        Transaction transaction = new()
+        {
+            AppUserId = user.Id,
+            UserBalance = user.TRYBalance,
+            Amount = dto.Amount,
+            IsPayment = false,
+            Feedback = $"Balans artımı TRY"
+
+        };
+        await _repository.CreateAsync(transaction);
+        await _repository.SaveAsync();
+
+
+        return new($"{user.Name} {user.Surname}-TRY Balance:{user.TRYBalance}₺");
+    }
     public async Task<ResultDto> IncreaseAZNBalanceAdmin(BalanceAdminPutDto dto)
     {
         var user = await GetUserById(dto.AppUserId);
@@ -76,7 +126,7 @@ public class TransactionService : ITransactionService
             UserBalance = user.AZNBalance,
             Amount = dto.Amount,
             IsPayment = false,
-            Feedback = "RePayment AZN Balance"
+            Feedback = "Pul qaytarımı AZN"
 
         };
         await _repository.CreateAsync(transaction);
@@ -89,30 +139,6 @@ public class TransactionService : ITransactionService
 
         return new($"{user.Name} {user.Surname}-AZN Balance:{user.AZNBalance}");
     }
-
-    public async Task<ResultDto> IncreaseTRYBalance(BalancePutDto dto)
-    {
-        var user = await GetUser();
-
-        user.TRYBalance += dto.Amount;
-        await _userManager.UpdateAsync(user);
-
-        Transaction transaction = new()
-        {
-            AppUserId = user.Id,
-            UserBalance = user.TRYBalance,
-            Amount = dto.Amount,
-            IsPayment = false,
-            Feedback = $"Increase TRY Balance"
-
-        };
-        await _repository.CreateAsync(transaction);
-        await _repository.SaveAsync();
-
-
-        return new($"{user.Name} {user.Surname}-TRY Balance:{user.TRYBalance}");
-    }
-
     public async Task<ResultDto> IncreaseTRYBalanceAdmin(BalanceAdminPutDto dto)
     {
         var user = await GetUserById(dto.AppUserId);
@@ -127,7 +153,7 @@ public class TransactionService : ITransactionService
             UserBalance = user.TRYBalance,
             Amount = dto.Amount,
             IsPayment = false,
-            Feedback = $"Repayment TRY Balance"
+            Feedback = $"Pul qaytarımı TRY"
 
         };
         await _repository.CreateAsync(transaction);
@@ -140,30 +166,6 @@ public class TransactionService : ITransactionService
 
         return new($"{user.Name} {user.Surname}-TRY Balance:{user.TRYBalance}");
     }
-
-    public async Task<ResultDto> IncreaseUSDBalance(BalancePutDto dto)
-    {
-        var user = await GetUser();
-
-        user.USDBalance += dto.Amount;
-        await _userManager.UpdateAsync(user);
-
-        Transaction transaction = new()
-        {
-            AppUserId = user.Id,
-            UserBalance = user.USDBalance,
-            Amount = dto.Amount,
-            IsPayment = false,
-            Feedback = $"Increase USD Balance"
-
-        };
-        await _repository.CreateAsync(transaction);
-        await _repository.SaveAsync();
-
-
-        return new($"{user.Name} {user.Surname}-USD Balance:{user.USDBalance}");
-    }
-
     public async Task<ResultDto> IncreaseUSDBalanceAdmin(BalanceAdminPutDto dto)
     {
 
@@ -178,7 +180,7 @@ public class TransactionService : ITransactionService
             UserBalance = user.AZNBalance,
             Amount = dto.Amount,
             IsPayment = false,
-            Feedback = $"Repayment USD Balance"
+            Feedback = $"Pul qaytarımı USD"
 
         };
         await _repository.CreateAsync(transaction);
@@ -191,7 +193,6 @@ public class TransactionService : ITransactionService
         await _companyService.UpdateCompanyAsync(company);
         return new($"{user.Name} {user.Surname}-USD Balance:{user.USDBalance}");
     }
-
     public async Task<ResultDto> PaymentByAZNBalance(BalancePutDto dto)
     {
         var user = await GetUser();
@@ -207,7 +208,7 @@ public class TransactionService : ITransactionService
             UserBalance = user.AZNBalance,
             Amount = dto.Amount,
             IsPayment = true,
-            Feedback = $"Payment AZN Balance"
+            Feedback = $"AZN balansından xərcləmə {dto.Amount}₼"
 
         };
         await _repository.CreateAsync(transaction);
@@ -237,7 +238,7 @@ public class TransactionService : ITransactionService
             UserBalance = user.TRYBalance,
             Amount = dto.Amount,
             IsPayment = true,
-            Feedback = $"Payment TRY Balance,Orders{string.Join(",", dto.OrderIds ?? new())}"
+            Feedback = $"TRY balansından xərcləmə {dto.Amount}₺,Sifarişlər:{string.Join(",", dto.OrderIds ?? new())}"
         };
 
         await _repository.CreateAsync(transaction);
@@ -266,7 +267,8 @@ public class TransactionService : ITransactionService
             UserBalance = user.TRYBalance,
             Amount = dto.Amount,
             IsPayment = true,
-            Feedback = $"Payment TRY Balance,Orders{string.Join(",", dto.OrderIds ?? new())}"
+            Feedback = $"USD balansından xərcləmə {dto.Amount}$,Sifarişlər:{string.Join(",", dto.OrderIds ?? new())}"
+
         };
 
         await _repository.CreateAsync(transaction);
@@ -285,7 +287,7 @@ public class TransactionService : ITransactionService
     public async Task<ExportExcelDto> ExportToExcelAsync()
     {
         var currentUser = await _authService.GetCurrentUserAsync();
-        var transactions = await _repository.GetFiltered(x => x.AppUserId == currentUser.Id, false, "AppUser").OrderByDescending(x => x.Id) .ToListAsync();
+        var transactions = await _repository.GetFiltered(x => x.AppUserId == currentUser.Id, false, "AppUser").OrderByDescending(x => x.Id).ToListAsync();
 
 
 
@@ -293,10 +295,10 @@ public class TransactionService : ITransactionService
         {
             IXLWorksheet worksheet = workBook.Worksheets.Add("Ödənişlər");
             worksheet.Cell(1, 1).Value = "Id";
-            worksheet.Cell(1, 2).Value = "Date/Time";
-            worksheet.Cell(1, 3).Value = "Amount";
-            worksheet.Cell(1, 4).Value = "Feedback";
-            worksheet.Cell(1, 5).Value = "UserBalance";
+            worksheet.Cell(1, 2).Value = "Tarix";
+            worksheet.Cell(1, 3).Value = "Məbləğ";
+            worksheet.Cell(1, 4).Value = "Açıqlama";
+            worksheet.Cell(1, 5).Value = "İstifadəçi balansı";
 
 
 
@@ -304,7 +306,10 @@ public class TransactionService : ITransactionService
             worksheet.Column(2).Width = 20;
             worksheet.Column(3).Width = 8;
             worksheet.Column(4).Width = 40;
-            worksheet.Column(5).Width = 20;
+            worksheet.Column(5).Width = 25;
+            worksheet.Column(6).Width = 20;
+            worksheet.Column(7).Width = 20;
+            worksheet.Column(8).Width = 20;
 
 
             for (int i = 0; i < transactions.Count; i++)
@@ -319,6 +324,18 @@ public class TransactionService : ITransactionService
 
 
             }
+
+
+            var count = transactions.Count + 5;
+            var balances = await GetBalances();
+
+            worksheet.Cell(count, 5).Value = $"{currentUser.Name} {currentUser.Surname}";
+            worksheet.Cell(count, 6).Value = $"AZN Balansı:{balances.AZNBalance}₼";
+            worksheet.Cell(count, 7).Value = $"TRY Balansı:{balances.TRYBalance}₺";
+            worksheet.Cell(count, 8).Value = $"USD Balansı:{balances.USDBalance}$";
+
+            worksheet.Range($"A1:K{count}").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
 
             using (var stream = new MemoryStream())
             {

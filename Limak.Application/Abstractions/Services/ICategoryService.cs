@@ -11,4 +11,6 @@ public interface ICategoryService
     Task<ResultDto> UpdateAsync(CategoryPutDto dto);
     Task<bool> IsExistAsync(int id);
     Task<ResultDto> DeleteAsync(int id);
+    Task<List<CategoryGetDto>> GetTrash();
+    Task<ResultDto> RepairDelete(int id);
 }

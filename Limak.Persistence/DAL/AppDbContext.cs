@@ -1,5 +1,6 @@
 ﻿using Limak.Domain.Entities;
 using Limak.Persistence.Interceptors;
+using Limak.Persistence.ServiceRegistration;
 using Limak.Persistence.Utilities.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -20,6 +21,7 @@ public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int>
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         builder.AddSeedData();
         base.OnModelCreating(builder);
+        builder.AddBaseAuditableEntityQueryFilter();
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -52,5 +54,6 @@ public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int>
     public DbSet<RequestSubject> RequestSubjects { get; set; } = null!;
     public DbSet<Transaction>Transactions  { get; set; } = null!;
     public DbSet<Setting> Settings  { get; set; } = null!;
+    public DbSet<Brand> Brands  { get; set; } = null!;
 
 }

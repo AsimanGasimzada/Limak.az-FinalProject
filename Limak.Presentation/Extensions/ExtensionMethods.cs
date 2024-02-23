@@ -1,9 +1,21 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Limak.Persistence.ContextInitializers;
+using Microsoft.OpenApi.Models;
 
 namespace Limak.Presentation.Extensions;
 
 public static class ExtensionMethods
 {
+
+
+    public static void ContextInitalize(this WebApplication app)
+    {
+        using (var scope = app.Services.CreateScope())
+        {
+            var initializer = scope.ServiceProvider.GetRequiredService<AppDbContextInitializer>();
+            initializer.InitializeDbContextAsync().Wait();
+            initializer.CreateUserRolesAsync().Wait();
+        }
+    }
 
     public static IServiceCollection AddCorsConfig(this IServiceCollection services)
     {

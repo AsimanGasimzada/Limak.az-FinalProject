@@ -13,7 +13,65 @@ public static class DbContextSeedData
         AddCountries(builder);
         AddUserPositions(builder);
         AddCitizenships(builder);
+        AddSettings(builder);
+        AddDefaultWarehouse(builder);
 
+
+    }
+
+    private static void AddSettings(ModelBuilder builder)
+    {
+        builder.Entity<Setting>().HasData(
+         new Setting { Id = 1, Key = "HeaderLogo", Value = "Image" },
+         new Setting { Id = 2, Key = "FooterLogo", Value = "Image" },
+         new Setting { Id = 3, Key = "PhoneNumber", Value = "number" },
+
+        //turkey
+         new Setting { Id = 4, Key = "XaricdekiUnvanlar-AdSoyad", Value = "0256069 - LİMAK TAŞIMACILIK DIŞ TİCARET LİMİTED ŞİRKETİ" },
+         new Setting { Id = 5, Key = "XaricdekiUnvanlar-AdressBasligi", Value = "LIMAK" },
+         new Setting { Id = 6, Key = "XaricdekiUnvanlar-AdressSatir", Value = "Gürsel mah.Bahçeler cad. Erdoğan iş merkezi 37-39B" },
+         new Setting { Id = 7, Key = "XaricdekiUnvanlar-IlSehir", Value = "Istanbul" },
+         new Setting { Id = 8, Key = "XaricdekiUnvanlar-Semt", Value = "Gürsel" },
+         new Setting { Id = 9, Key = "XaricdekiUnvanlar-TCKimlik", Value = "35650276048" },
+         new Setting { Id = 10, Key = "XaricdekiUnvanlar-İlce", Value = "Kağıthane" },
+         new Setting { Id = 11, Key = "XaricdekiUnvanlar-PostKodu", Value = "34400" },
+         new Setting { Id = 12, Key = "XaricdekiUnvanlar-Telefon", Value = "05364700021" },
+         new Setting { Id = 13, Key = "XaricdekiUnvanlar-VergiDairesi", Value = "Şişli" },
+         new Setting { Id = 14, Key = "XaricdekiUnvanlar-Ulke", Value = "Türkiye" },
+         new Setting { Id = 15, Key = "XaricdekiUnvanlar-VergiNo", Value = "6081089593" },
+         new Setting { Id = 16, Key = "XaricdekiUnvanlar-TrendyolSMS", Value = "05356191259" },
+
+         //America
+         new Setting { Id = 17, Key = "XaricdekiUnvanlar-AddressLine1", Value = "320 Cornell drive C1" },
+         new Setting { Id = 18, Key = "XaricdekiUnvanlar-State", Value = "Delaware (DE) " },
+         new Setting { Id = 19, Key = "XaricdekiUnvanlar-City", Value = "Wilmington " },
+         new Setting { Id = 20, Key = "XaricdekiUnvanlar-Postalcode", Value = "19801" },
+         new Setting { Id = 21, Key = "XaricdekiUnvanlar-Country", Value = "United States" },
+         new Setting { Id = 22, Key = "XaricdekiUnvanlar-PhoneNumber", Value = "862-5718476" }
+
+         );
+    }
+
+    private static void AddDefaultWarehouse(ModelBuilder builder)
+    {
+        builder.Entity<Warehouse>().HasData(
+            new Warehouse
+            {
+                Id = 1,
+                CreatedBy = "Admin",
+                ModifiedBy = "Admin",
+                WorkingHours = "Default warehouse",
+                CreatedTime = DateTime.MinValue,
+                ModifiedTime = DateTime.MinValue,
+                DeliveryAreas = new List<DeliveryArea>() { },
+                Email = "Default@gmail.com",
+                IsDeleted = true,
+                Location = "Default",
+                Name = "Default",
+                Orders = new List<Order>(),
+                PhoneNumber = "Default",
+                Position = "Default"
+            });
     }
 
     private static void InitCompany(ModelBuilder builder)

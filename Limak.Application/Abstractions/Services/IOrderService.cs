@@ -7,9 +7,10 @@ namespace Limak.Application.Abstractions.Services;
 public interface IOrderService
 {
     Task<List<OrderGetDto>> GetAllAsync();
+    Task<List<OrderGetDto>> GetFilterByAdminAsync(OrderFilterAdminDto dto);
     Task<List<OrderGetDto>> GetNotPaymentOrders();
     Task<List<OrderGetDto>> GetUserAllOrders();
-
+    Task<List<OrderGetDto>> GetFilterByUserAsync(OrderFilterDto dto);
     Task<OrderGetDto> GetByIdAsync(int id);
     Task<ResultDto> CreateAsync(OrderPostDto dto);
     Task<ResultDto> UpdateAsync(OrderPutDto dto);
@@ -25,4 +26,5 @@ public interface IOrderService
     Task<ResultDto> SetKargomatAsync(OrderSetKargomatDto dto);
     Task<ResultDto> CancelKargomatAsync(int orderId);
     Task<ResultDto> CreateByAdminAsync(OrderAdminPostDto dto);
+    Task<ResultDto> PayOrderByAdminAsync(int orderId);
 }

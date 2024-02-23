@@ -4,7 +4,6 @@ using Limak.Application.Abstractions.Repositories;
 using Limak.Application.Abstractions.Services;
 using Limak.Application.DTOs.OrderDTOs;
 using Limak.Application.DTOs.RepsonseDTOs;
-using Limak.Application.Validators.AuthValidators;
 using Limak.Domain.Entities;
 using Limak.Domain.Enums;
 using Limak.Persistence.Utilities.Exceptions.Common;
@@ -234,6 +233,64 @@ public class OrderService : IOrderService
 
         return new($"{order.Id}-Order is successfully updated");
     }
+    public async Task<List<OrderGetDto>> GetFilterByUserAsync(OrderFilterDto dto)
+    {
+        var currentUser = await _authService.GetCurrentUserAsync();
+
+        var orders = _repository.GetFiltered(x => x.AppUserId == currentUser.Id, false, "Status", "AppUser", "Country", "Kargomat", "Warehouse", "Delivery", "Shop");
+
+
+        if (dto.CountryId != null && dto.CountryId != 0)
+        {
+            var isExistCountry = await _countryService.IsExist((int)dto.CountryId);
+            if (!isExistCountry)
+                throw new NotFoundException($"{dto.CountryId}-this Country is not found");
+
+            orders = orders.Where(x => x.CountryId == dto.CountryId);
+        }
+
+        if (dto.StatusId != null && dto.StatusId != 0)
+        {
+            var isExistStatus = await _statusService.IsExist((int)dto.StatusId);
+            if (!isExistStatus)
+                throw new NotFoundException($"{dto.StatusId}-this Status is not found");
+
+            orders = orders.Where(x => x.StatusId == dto.StatusId);
+        }
+
+
+        if (dto.WarehouseId != null && dto.WarehouseId != 0)
+        {
+            var isExistWarehouse = await _warehouseService.IsExist((int)dto.WarehouseId);
+            if (!isExistWarehouse)
+                throw new NotFoundException($"{dto.WarehouseId}-this Warehouse is not found");
+
+            orders = orders.Where(x => x.WarehouseId == dto.WarehouseId);
+        }
+
+
+        if (dto.KargomatId != null && dto.KargomatId != 0)
+        {
+            var isExistKargomat = await _kargomatService.IsExistAsync((int)dto.KargomatId);
+            if (!isExistKargomat)
+                throw new NotFoundException($"{dto.KargomatId}-this Kargomat is not found");
+
+            orders = orders.Where(x => x.KargomatId == dto.KargomatId);
+        }
+
+
+        var ordersList = await orders.ToListAsync();
+
+        if (ordersList.Count is 0)
+            throw new NotFoundException("Order is not found");
+
+
+        var dtos = _mapper.Map<List<OrderGetDto>>(ordersList);
+
+        return dtos;
+
+
+    }
 
     // Admin methods
 
@@ -406,10 +463,90 @@ public class OrderService : IOrderService
 
     }
 
+    public async Task<List<OrderGetDto>> GetFilterByAdminAsync(OrderFilterAdminDto dto)
+    {
+
+        var orders = _repository.GetAll(false, "Status", "AppUser", "Country", "Kargomat", "Warehouse", "Delivery", "Shop");
+
+
+        if (dto.AppUserId != null && dto.AppUserId != 0)
+        {
+            var User = await _authService.GetUserByIdAsync((int)dto.AppUserId);
+            orders = orders.Where(x => x.AppUserId == dto.AppUserId);
+        }
+
+        if (dto.CountryId != null && dto.CountryId != 0)
+        {
+            var isExistCountry = await _countryService.IsExist((int)dto.CountryId);
+            if (!isExistCountry)
+                throw new NotFoundException($"{dto.CountryId}-this Country is not found");
+
+            orders = orders.Where(x => x.CountryId == dto.CountryId);
+        }
+
+        if (dto.StatusId != null && dto.StatusId != 0)
+        {
+            var isExistStatus = await _statusService.IsExist((int)dto.StatusId);
+            if (!isExistStatus)
+                throw new NotFoundException($"{dto.StatusId}-this Status is not found");
+
+            orders = orders.Where(x => x.StatusId == dto.StatusId);
+        }
+
+
+        if (dto.WarehouseId != null && dto.WarehouseId != 0)
+        {
+            var isExistWarehouse = await _warehouseService.IsExist((int)dto.WarehouseId);
+            if (!isExistWarehouse)
+                throw new NotFoundException($"{dto.WarehouseId}-this Warehouse is not found");
+
+            orders = orders.Where(x => x.WarehouseId == dto.WarehouseId);
+        }
+
+
+        if (dto.KargomatId != null && dto.KargomatId != 0)
+        {
+            var isExistKargomat = await _kargomatService.IsExistAsync((int)dto.KargomatId);
+            if (!isExistKargomat)
+                throw new NotFoundException($"{dto.KargomatId}-this Kargomat is not found");
+
+            orders = orders.Where(x => x.KargomatId == dto.KargomatId);
+        }
+
+
+        var ordersList = await orders.ToListAsync();
+
+        if (ordersList.Count is 0)
+            throw new NotFoundException("Order is not found");
+
+
+        var dtos = _mapper.Map<List<OrderGetDto>>(ordersList);
+
+        return dtos;
+    }
+    public async Task<ResultDto> PayOrderByAdminAsync(int orderId)
+    {
+        var order = await _getOrder(orderId);
+
+        if (order.CargoPaymentStatus && order.OrderPaymentStatus)
+            throw new NotFoundException($"{orderId}-Order is not found");
+
+
+        order.CargoPaymentStatus = true;
+        order.OrderPaymentStatus = true;
+
+        var status = await _statusService.GetByNameAsync(StatusNames.OrderIsDone);
+        order.StatusId = status.Id;
+
+        _repository.Update(order);
+        await _repository.SaveAsync();
+
+        return new("Order is successfully payed");
+    }
 
     private async Task<Order> _getOrder(int id)
     {
-        var order = await _repository.GetSingleAsync(x => x.Id == id, false, "Status", "AppUser", "Country");
+        var order = await _repository.GetSingleAsync(x => x.Id == id, false, "Status", "AppUser", "Country", "Kargomat", "Warehouse", "Delivery", "Shop");
         if (order is null)
             throw new NotFoundException($"{id}-This order is not found");
         return order;

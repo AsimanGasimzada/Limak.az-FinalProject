@@ -13,4 +13,5 @@ public interface IChatService
     Task<ChatGetDto> GetByIdAsync(int id);
     Task<List<ChatGetDto>> GetAll();
     Task<ChatGetDto> GetOnlineChatAsync();
+    Task<List<ChatGetDto>> GetWithoutAnOperatorChats();
 }

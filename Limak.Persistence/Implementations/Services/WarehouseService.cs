@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using Limak.Application.Abstractions.Repositories;
 using Limak.Application.Abstractions.Services;
 using Limak.Application.DTOs.RepsonseDTOs;
@@ -79,6 +80,45 @@ public class WarehouseService : IWarehouseService
         await _repository.SaveAsync();
         return new($"{existedWarehouse.Name}-Warehouse is successfully updated");
     }
+
+
+    public async Task<List<WarehouseGetDto>> GetTrash()
+    {
+        var warehouses = await _repository.GetFiltered(x => x.IsDeleted, true).ToListAsync();
+        if (warehouses.Count is 0)
+            throw new NotFoundException("Trash is empty");
+
+        var dtos = _mapper.Map<List<WarehouseGetDto>>(warehouses);
+
+        return dtos;
+    }
+
+
+    public async Task<ResultDto> RepairDelete(int id)
+    {
+        var warehouse = await _repository.GetSingleAsync(x => x.Id == id, true);
+        if (warehouse is null)
+            throw new NotFoundException($"{id}-warehouse is not found");
+
+        _repository.Repair(warehouse);
+        await _repository.SaveAsync();
+
+        return new($"{id}-warehouse is successfully repair");
+    }
+
+    public async Task<WarehouseGetDto> FirstOrDefault()
+    {
+        var warehouse = await _repository.GetSingleAsync(x =>x.Id>0, true);
+        if (warehouse is null)
+            throw new NotFoundException($"warehouse is not found");
+
+
+        var dto=_mapper.Map<WarehouseGetDto>(warehouse);
+
+        return dto;
+    }
+
+
 
     private async Task<Warehouse> _getWarehouse(int id)
     {

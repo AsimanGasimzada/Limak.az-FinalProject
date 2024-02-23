@@ -166,6 +166,34 @@ namespace Limak.Persistence.DAL.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Limak.Domain.Entities.Brand", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("ImagePath")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("WebsitePath")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Brands");
+                });
+
             modelBuilder.Entity("Limak.Domain.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -493,6 +521,16 @@ namespace Limak.Persistence.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("CordinateX")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("CordinateY")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -514,11 +552,6 @@ namespace Limak.Persistence.DAL.Migrations
 
                     b.Property<DateTime>("ModifiedTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Position")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -946,6 +979,140 @@ namespace Limak.Persistence.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Settings");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Key = "HeaderLogo",
+                            Value = "Image"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Key = "FooterLogo",
+                            Value = "Image"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Key = "PhoneNumber",
+                            Value = "number"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Key = "XaricdekiUnvanlar-AdSoyad",
+                            Value = "0256069 - LİMAK TAŞIMACILIK DIŞ TİCARET LİMİTED ŞİRKETİ"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Key = "XaricdekiUnvanlar-AdressBasligi",
+                            Value = "LIMAK"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Key = "XaricdekiUnvanlar-AdressSatir",
+                            Value = "Gürsel mah.Bahçeler cad. Erdoğan iş merkezi 37-39B"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Key = "XaricdekiUnvanlar-IlSehir",
+                            Value = "Istanbul"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Key = "XaricdekiUnvanlar-Semt",
+                            Value = "Gürsel"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Key = "XaricdekiUnvanlar-TCKimlik",
+                            Value = "35650276048"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Key = "XaricdekiUnvanlar-İlce",
+                            Value = "Kağıthane"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Key = "XaricdekiUnvanlar-PostKodu",
+                            Value = "34400"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Key = "XaricdekiUnvanlar-Telefon",
+                            Value = "05364700021"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Key = "XaricdekiUnvanlar-VergiDairesi",
+                            Value = "Şişli"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Key = "XaricdekiUnvanlar-Ulke",
+                            Value = "Türkiye"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Key = "XaricdekiUnvanlar-VergiNo",
+                            Value = "6081089593"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Key = "XaricdekiUnvanlar-TrendyolSMS",
+                            Value = "05356191259"
+                        },
+                        new
+                        {
+                            Id = 17,
+                            Key = "XaricdekiUnvanlar-AddressLine1",
+                            Value = "320 Cornell drive C1"
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Key = "XaricdekiUnvanlar-State",
+                            Value = "Delaware (DE) "
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Key = "XaricdekiUnvanlar-City",
+                            Value = "Wilmington "
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Key = "XaricdekiUnvanlar-Postalcode",
+                            Value = "19801"
+                        },
+                        new
+                        {
+                            Id = 21,
+                            Key = "XaricdekiUnvanlar-Country",
+                            Value = "United States"
+                        },
+                        new
+                        {
+                            Id = 22,
+                            Key = "XaricdekiUnvanlar-PhoneNumber",
+                            Value = "862-5718476"
+                        });
                 });
 
             modelBuilder.Entity("Limak.Domain.Entities.Shop", b =>
@@ -1281,6 +1448,23 @@ namespace Limak.Persistence.DAL.Migrations
                         .IsUnique();
 
                     b.ToTable("Warehouses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedBy = "Admin",
+                            CreatedTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "Default@gmail.com",
+                            IsDeleted = true,
+                            Location = "Default",
+                            ModifiedBy = "Admin",
+                            ModifiedTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Name = "Default",
+                            PhoneNumber = "Default",
+                            Position = "Default",
+                            WorkingHours = "Default warehouse"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>

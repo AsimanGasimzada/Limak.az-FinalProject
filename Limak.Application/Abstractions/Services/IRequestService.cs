@@ -10,5 +10,6 @@ public interface IRequestService
     Task<List<RequestGetDto>> GetUsersAllRequestsAsync();
     Task<ResultDto> SetOperatorAsync(int requestId);
     Task<List<RequestGetDto>> GetAllAsync();
+    Task<List<RequestGetDto>> GetWithoutAnOperatorRequests();
     Task<RequestGetDto> GetByIdAsync(int id);
 }

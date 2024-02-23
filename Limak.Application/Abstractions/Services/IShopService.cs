@@ -11,3 +11,6 @@ public interface IShopService
     Task<ResultDto> UpdateAsync(ShopPutDto dto);
     Task<ResultDto> DeleteAsync(int id);
 }
+
+
+

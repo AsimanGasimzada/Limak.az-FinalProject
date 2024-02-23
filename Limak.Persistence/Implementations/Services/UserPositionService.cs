@@ -83,6 +83,20 @@ public class UserPositionService : IUserPositionService
     }
 
 
+    public async Task<UserPositionGetDto> FirstOrDefault()
+    {
+        var UserPosition = await _repository.GetSingleAsync(x => x.Id > 0, true);
+        if (UserPosition is null)
+            throw new NotFoundException($"UserPosition is not found");
+
+
+        var dto = _mapper.Map<UserPositionGetDto>(UserPosition);
+
+        return dto;
+    }
+
+
+
     private async Task<UserPosition> _getUserPosition(int id)
     {
         var UserPosition = await _repository.GetSingleAsync(x => x.Id == id);

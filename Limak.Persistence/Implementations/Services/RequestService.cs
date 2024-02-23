@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using Limak.Application.Abstractions.Repositories;
 using Limak.Application.Abstractions.Services;
 using Limak.Application.DTOs.RepsonseDTOs;
 using Limak.Application.DTOs.RequestDTOs;
 using Limak.Domain.Entities;
-using Limak.Domain.Enums;
 using Limak.Persistence.Utilities.Exceptions.Common;
 using Limak.Persistence.Utilities.Exceptions.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -110,5 +108,20 @@ public class RequestService : IRequestService
 
         return new("Succesfully setup");
 
+    }
+
+
+
+    public async Task<List<RequestGetDto>> GetWithoutAnOperatorRequests()
+    {
+
+        var requests=await _repository.GetFiltered(x=>x.OperatorId==0 || x.OperatorId==null,false, "RequestSubject", "RequestMessages", "Operator", "AppUser", "Country").ToListAsync();
+
+        if (requests.Count is 0)
+            throw new NotFoundException("Request is not found");
+
+        var dtos=_mapper.Map<List<RequestGetDto>>(requests);
+
+        return dtos;
     }
 }

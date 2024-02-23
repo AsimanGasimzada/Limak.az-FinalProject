@@ -29,7 +29,7 @@ public class TariffService : ITariffService
         if (!isExistCountry)
             throw new NotFoundException($"{dto.CountryId}-Country is not found!");
 
-        var isExist = await _repository.IsExistAsync(x => !(x.MaxValue <= dto.MinValue || x.MinValue >= dto.MaxValue) && x.CountryId==dto.CountryId);
+        var isExist = await _repository.IsExistAsync(x => !(x.MaxValue <= dto.MinValue || x.MinValue >= dto.MaxValue) && x.CountryId == dto.CountryId);
         if (isExist)
             throw new AlreadyExistException("this range is already exist");
 
@@ -85,13 +85,13 @@ public class TariffService : ITariffService
 
     public async Task<ResultDto> UpdateAsync(TariffPutDto dto)
     {
-        var existedTariff=await _getTariff(dto.Id);
+        var existedTariff = await _getTariff(dto.Id);
 
         var isExistCountry = await _countryService.IsExist(dto.CountryId);
         if (!isExistCountry)
             throw new NotFoundException($"{dto.CountryId}-Country is not found!");
 
-        var isExist = await _repository.IsExistAsync(x => !(x.MaxValue <= dto.MinValue || x.MinValue >= dto.MaxValue) && x.Id!=dto.Id);
+        var isExist = await _repository.IsExistAsync(x => !(x.MaxValue <= dto.MinValue || x.MinValue >= dto.MaxValue) && x.Id != dto.Id);
         if (isExist)
             throw new AlreadyExistException("this range is already exist");
 
@@ -105,9 +105,37 @@ public class TariffService : ITariffService
 
 
 
+
+
+    public async Task<List<TariffGetDto>> GetTrash()
+    {
+        var tariffs = await _repository.GetFiltered(x => x.IsDeleted, true, "Country").ToListAsync();
+        if (tariffs.Count is 0)
+            throw new NotFoundException("Trash is empty");
+
+        var dtos = _mapper.Map<List<TariffGetDto>>(tariffs);
+
+        return dtos;
+    }
+
+
+    public async Task<ResultDto> RepairDelete(int id)
+    {
+        var tariff = await _repository.GetSingleAsync(x => x.Id == id, true);
+        if (tariff is null)
+            throw new NotFoundException($"{id}-tariff is not found");
+
+        _repository.Repair(tariff);
+        await _repository.SaveAsync();
+
+        return new($"{id}-Tariff is successfully repair");
+    }
+
+
+
     public async Task<TariffGetDto> GetTariffByWeight(decimal weight, int countryId)
     {
-        var tariff=await _repository.GetSingleAsync(x=>x.MinValue<=weight && x.MaxValue>=weight && x.CountryId==countryId);
+        var tariff = await _repository.GetSingleAsync(x => x.MinValue <= weight && x.MaxValue >= weight && x.CountryId == countryId);
         if (tariff is null)
             throw new NotFoundException($"{weight}-Tariff is not found");
         var dto = _mapper.Map<TariffGetDto>(tariff);

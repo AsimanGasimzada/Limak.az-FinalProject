@@ -59,4 +59,15 @@ public class ChatsController : ControllerBase
     {
         return Ok(await _service.SetOperatorAsync(id));
     }
+
+
+
+
+    [HttpGet("[action]")]
+    [Authorize(Roles = "Admin,Moderator")]
+    public async Task<IActionResult> GetWithoutAnOperatorChats()
+    {
+        return Ok(await _service.GetWithoutAnOperatorChats());
+    }
+
 }

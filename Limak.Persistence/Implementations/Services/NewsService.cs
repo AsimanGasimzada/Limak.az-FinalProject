@@ -39,7 +39,7 @@ public class NewsService : INewsService
     {
         var news = await _getNews(id);
 
-        _repository.SoftDelete(news);
+        _repository.HardDelete(news);
         await _repository.SaveAsync();
 
         return new($"{news.Subject}-News is successfully deleted");
@@ -52,7 +52,7 @@ public class NewsService : INewsService
         if (page < 1)
             throw new InvalidInputException();
 
-        var query = _repository.GetFiltered(p => !string.IsNullOrWhiteSpace(search) ? p.Subject.Contains(search) : true);
+        var query = _repository.GetFiltered(x => !string.IsNullOrWhiteSpace(search) ? x.Subject.Contains(search) : true);
         var news = await _repository.Paginate(query, 12, page).ToListAsync();
         if (news.Count is 0)
             throw new NotFoundException("News not found!");

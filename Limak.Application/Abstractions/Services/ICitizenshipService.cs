@@ -10,5 +10,6 @@ public interface ICitizenshipService
     Task<ResultDto> CreateAsync(CitizenshipPostDto dto);
     Task<ResultDto> UpdateAsync(CitizenshipPutDto dto);
     Task<bool> IsExist(int id);
-    Task<ResultDto> DeleteAsync(int id); 
+    Task<ResultDto> DeleteAsync(int id);
+    Task<CitizenshipGetDto> FirstOrDefault();
 }

@@ -1,4 +1,5 @@
-﻿using Limak.Application.DTOs.DeliveryAreaDTOs;
+﻿using Limak.Application.DTOs.CategoryDTOs;
+using Limak.Application.DTOs.DeliveryAreaDTOs;
 using Limak.Application.DTOs.RepsonseDTOs;
 
 namespace Limak.Application.Abstractions.Services;
@@ -11,4 +12,6 @@ public interface IDeliveryAreaService
     Task<ResultDto> UpdateAsync(DeliveryAreaPutDto dto);
     Task<bool> IsExist(int id);
     Task<ResultDto> DeleteAsync(int id);
+    Task<List<DeliveryAreaGetDto>> GetTrash();
+    Task<ResultDto> RepairDelete(int id);
 }

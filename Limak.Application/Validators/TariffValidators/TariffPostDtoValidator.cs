@@ -7,7 +7,7 @@ public class TariffPostDtoValidator : AbstractValidator<TariffPostDto>
 {
     public TariffPostDtoValidator()
     {
-        RuleFor(x => x.CountryId).NotNull();
+        RuleFor(x => x.CountryId).NotNull().GreaterThan(0);
         RuleFor(x => x.MinValue).NotNull().GreaterThanOrEqualTo(0);
         RuleFor(x => x.MaxValue).NotNull().GreaterThanOrEqualTo(0);
         RuleFor(x => x.MaxValue)

@@ -12,4 +12,6 @@ public interface ITariffService
     Task<bool> IsExistAsync(int id);
     Task<ResultDto> DeleteAsync(int id);
     Task<TariffGetDto> GetTariffByWeight(decimal weight,int countryId);
+    Task<List<TariffGetDto>> GetTrash();
+    Task<ResultDto> RepairDelete(int id);
 }

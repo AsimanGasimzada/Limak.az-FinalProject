@@ -58,4 +58,13 @@ public class RequestsController : ControllerBase
     {
         return Ok(await _service.SetOperatorAsync(requestId));
     }
+
+
+    [HttpGet("[action]")]
+    [Authorize(Roles = "Admin,Moderator")]
+    public async Task<IActionResult> GetWithoutAnOperatorRequests()
+    {
+        return Ok(await _service.GetWithoutAnOperatorRequests());
+    }
+
 }

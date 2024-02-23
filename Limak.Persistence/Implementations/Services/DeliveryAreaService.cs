@@ -82,6 +82,32 @@ public class DeliveryAreaService:IDeliveryAreaService
         return new($"{existedDeliveryArea.Name}-DeliveryArea is successfully updated");
     }
 
+
+
+    public async Task<List<DeliveryAreaGetDto>> GetTrash()
+    {
+        var deliveryAreas = await _repository.GetFiltered(x => x.IsDeleted, true, "Warehouse").ToListAsync();
+        if (deliveryAreas.Count is 0)
+            throw new NotFoundException("Trash is empty");
+
+        var dtos = _mapper.Map<List<DeliveryAreaGetDto>>(deliveryAreas);
+
+        return dtos;
+    }
+
+
+    public async Task<ResultDto> RepairDelete(int id)
+    {
+        var deliveryArea = await _repository.GetSingleAsync(x => x.Id == id, true);
+        if (deliveryArea is null)
+            throw new NotFoundException($"{id}-DeliveryArea is not found");
+
+        _repository.Repair(deliveryArea);
+        await _repository.SaveAsync();
+
+        return new($"{deliveryArea.Name}-Delivery Area is successfully repair");
+    }
+
     private async Task<DeliveryArea> _getDeliveryArea(int id)
     {
         var DeliveryArea = await _repository.GetSingleAsync(x => x.Id == id,false, "Warehouse");

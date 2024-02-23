@@ -11,4 +11,5 @@ public interface IUserPositionService
     Task<ResultDto> UpdateAsync(UserPositionPutDto dto);
     Task<bool> IsExist(int id);
     Task<ResultDto> DeleteAsync(int id);
+    Task<UserPositionGetDto> FirstOrDefault();
 }

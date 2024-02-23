@@ -12,6 +12,6 @@ public class AppUserAccountDataPutDtoValidator:AbstractValidator<AppUserAccountD
         RuleFor(x => x.Email).NotNull().MaximumLength(256).MinimumLength(5);
         RuleFor(x => x.PhoneNumber).NotNull().MaximumLength(64).MinimumLength(5);
         RuleFor(x => x.Birtday).NotNull();
-        RuleFor(x => x.WarehouseId).NotNull();
+        RuleFor(x => x.WarehouseId).NotNull().GreaterThan(0);
     }
 }

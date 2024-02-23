@@ -12,4 +12,6 @@ public interface IKargomatService
     Task<ResultDto> UpdateAsync(KargomatPutDto dto);
     Task<bool> IsExistAsync(int id);
     Task<ResultDto> DeleteAsync(int id);
+    Task<List<KargomatGetDto>> GetTrash();
+    Task<ResultDto> RepairDelete(int id);
 }

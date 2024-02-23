@@ -18,11 +18,19 @@ public class OrdersController : ControllerBase
     }
 
 
-    [HttpGet("[action]")]
+    [HttpGet]
     [Authorize(Roles = "Member")]
     public async Task<IActionResult> GetAllAsync()
     {
         return Ok(await _service.GetUserAllOrders());
+    }
+
+
+    [HttpPost("[action]")]
+    [Authorize(Roles = "Member")]
+    public async Task<IActionResult> FilterOrders(OrderFilterDto dto)
+    {
+        return Ok(await _service.GetFilterByUserAsync(dto));
     }
 
 
@@ -44,13 +52,14 @@ public class OrdersController : ControllerBase
 
     [HttpPost("[action]/{id}")]
     [Authorize(Roles = "Member")]
-    public async Task<IActionResult> PayOrder([FromRoute]int id)
+    public async Task<IActionResult> PayOrder([FromRoute] int id)
     {
         return Ok(await _service.PayFullOrder(id));
     }
 
 
     [HttpGet("{id}")]
+    [Authorize]
     public async Task<IActionResult> GetByIdAsync([FromRoute] int id)
     {
         return Ok(await _service.GetByIdAsync(id));
@@ -69,6 +78,7 @@ public class OrdersController : ControllerBase
         return Ok(await _service.DeleteAsync(id));
     }
     [HttpPut]
+    [Authorize(Roles = "Member")]
     public async Task<IActionResult> UpdateAsync([FromForm] OrderPutDto dto)
     {
 
@@ -76,6 +86,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpPatch("[action]")]
+    [Authorize(Roles = "Member")]
     public async Task<IActionResult> SetKargomat(OrderSetKargomatDto dto)
     {
         return Ok(await _service.SetKargomatAsync(dto));
@@ -124,9 +135,23 @@ public class OrdersController : ControllerBase
 
 
     [HttpPost("[action]")]
-    [Authorize(Roles ="Admin,Moderator")]
+    [Authorize(Roles = "Admin,Moderator")]
     public async Task<IActionResult> CreateByAdmin(OrderAdminPostDto dto)
     {
         return Ok(await _service.CreateByAdminAsync(dto));
+    }
+    [HttpPost("[action]")]
+    [Authorize(Roles = "Admin,Moderator")]
+    public async Task<IActionResult> FilterOrdersAdmin(OrderFilterAdminDto dto)
+    {
+        return Ok(await _service.GetFilterByAdminAsync(dto));
+    }
+
+
+    [HttpPatch("[action]/{id}")]
+    [Authorize(Roles = "Admin,Moderator")]
+    public async Task<IActionResult> PayOrderByAdmin([FromRoute] int id)
+    {
+        return Ok(await _service.PayOrderByAdminAsync(id));
     }
 }

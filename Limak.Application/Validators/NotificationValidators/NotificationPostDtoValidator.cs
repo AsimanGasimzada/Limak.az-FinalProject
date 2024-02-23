@@ -9,6 +9,6 @@ public class NotificationPostDtoValidator : AbstractValidator<NotificationPostDt
     {
         RuleFor(x => x.Subject).NotNull().MaximumLength(128).MinimumLength(3);
         RuleFor(x => x.Title).NotNull().MaximumLength(1024).MinimumLength(3);
-        RuleFor(x => x.AppUserId).NotNull().GreaterThan(0);
+        RuleFor(x => x.AppUserId).NotNull().GreaterThan(0).GreaterThan(0);
     }
 }

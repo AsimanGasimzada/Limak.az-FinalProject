@@ -124,6 +124,21 @@ public class ChatService : IChatService
     }
 
 
+
+    public async Task<List<ChatGetDto>> GetWithoutAnOperatorChats()
+    {
+
+        var requests = await _repository.GetFiltered(x => x.OperatorId == 0 || x.OperatorId == null, false, "AppUser", "Operator", "Messages").ToListAsync();
+
+        if (requests.Count is 0)
+            throw new NotFoundException("Request is not found");
+
+        var dtos = _mapper.Map<List<ChatGetDto>>(requests);
+
+        return dtos;
+    }
+
+
     private async Task<Chat> _getChatById(int id)
     {
         var chat = await _repository.GetSingleAsync(x => x.Id == id,false,"Operator","AppUser","Messages");

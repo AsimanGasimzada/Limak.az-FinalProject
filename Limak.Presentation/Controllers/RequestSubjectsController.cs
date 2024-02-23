@@ -1,6 +1,7 @@
 ﻿using Limak.Application.Abstractions.Services;
 using Limak.Application.DTOs.CountryDTOs;
 using Limak.Application.DTOs.RequestSubjectDTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Limak.Presentation.Controllers;
@@ -29,6 +30,7 @@ public class RequestSubjectsController : ControllerBase
         return Ok(await _service.GetByIdAsync(id));
     }
     [HttpPost]
+    [Authorize(Roles = "Admin,Moderator")]
     public async Task<IActionResult> CreateAsync([FromForm] RequestSubjectPostDto dto)
     {
 
@@ -36,12 +38,14 @@ public class RequestSubjectsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin,Moderator")]
     public async Task<IActionResult> DeleteAsync([FromRoute] int id)
     {
 
         return Ok(await _service.DeleteAsync(id));
     }
     [HttpPut]
+    [Authorize(Roles = "Admin,Moderator")]
     public async Task<IActionResult> UpdateAsync(RequestSubjectPutDto dto)
     {
 

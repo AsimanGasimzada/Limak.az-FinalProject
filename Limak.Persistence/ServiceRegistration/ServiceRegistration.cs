@@ -1,6 +1,7 @@
 ﻿using Limak.Application.Abstractions.Repositories;
 using Limak.Application.Abstractions.Services;
 using Limak.Domain.Entities;
+using Limak.Persistence.ContextInitializers;
 using Limak.Persistence.DAL;
 using Limak.Persistence.Implementations.Hubs;
 using Limak.Persistence.Implementations.Repositories;
@@ -27,6 +28,32 @@ public static class ServiceRegistration
 
 
         return services;
+    }
+
+
+
+
+    public static ModelBuilder AddBaseAuditableEntityQueryFilter(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Category>().HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Chat>().HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Delivery>().HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<DeliveryArea>().HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Kargomat>().HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Message>().HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Order>().HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Request>().HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<RequestMessage>().HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Shop>().HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Tariff>().HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Transaction>().HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Warehouse>().HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<News>().HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Notification>().HasQueryFilter(x => !x.IsDeleted);
+
+
+
+        return modelBuilder;
     }
 
     public static WebApplication AddSignalREndpoints(this WebApplication app)
@@ -95,6 +122,10 @@ public static class ServiceRegistration
         services.AddScoped<IRequestSubjectService, RequestSubjectService>();
         services.AddScoped<IRequestService, RequestService>();
         services.AddScoped<IRequestMessageService, RequestMessageService>();
+        services.AddScoped<ISettingService, SettingService>();
+        services.AddScoped<IBrandService, BrandService>();
+
+        services.AddScoped<AppDbContextInitializer>();
     }
 
     private static void AddRepositories(IServiceCollection services)
@@ -122,6 +153,9 @@ public static class ServiceRegistration
         services.AddScoped<IRequestRepository, RequestRepository>();
         services.AddScoped<IRequestMessageRepository, RequestMessageRepository>();
         services.AddScoped<ITransactionRepository, TransactionRepository>();
+        services.AddScoped<ISettingRepository, SettingRepository>();
+        services.AddScoped<IBrandRepository, BrandRepository>();
+
 
     }
     #endregion

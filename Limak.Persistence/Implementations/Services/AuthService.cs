@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Security.Claims;
+using System.Text;
 
 namespace Limak.Persistence.Implementations.Services;
 
@@ -92,19 +93,14 @@ public class AuthService : IAuthService
 
         return new($"The user has been successfully created, please check your email inbox for email confirmation.");
     }
-    public async Task<ResultDto> CreateRolesAsync()
-    {
-        foreach (var role in Enum.GetNames(typeof(IdentityRoles)))
-        {
-            await _roleManager.CreateAsync(new() { Name = role });
-        }
-        return new("Successfully Created");
-    }
     public async Task<AccessToken> LoginAsync(LoginDto dto)
     {
         var user = await _userManager.FindByEmailAsync(dto.Email);
         if (user is null)
             throw new LoginException();
+        if (!user.EmailConfirmed)
+            throw new LoginException("User is email not confirmed please check your email inbox");
+
 
         var result = await _userManager.CheckPasswordAsync(user, dto.Password);
         if (user.AccessFailedCount == 3)
@@ -215,7 +211,7 @@ public class AuthService : IAuthService
 
         string token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-        string path = Path.Combine("http://localhost:3000", "ForgetPassword", $"AppUserId={user.Id}", $"token={token}");
+        string path = Path.Combine("http://localhost:3000", $"ForgetPassword?AppUserId={user.Id}&token={token}");
         string body = _resetPasswordBody.Replace("{Replace_Link_1}", path);
         body = body.Replace("{Replace_Link_2}", path);
         body = body.Replace("{Replace_Link_3}", path);
@@ -235,9 +231,9 @@ public class AuthService : IAuthService
 
         return dto;
     }
-    public async Task<List<AppUserGetDto>> GetAllUsersAsync()
+    public async Task<List<AppUserGetDto>> GetAllUsersAsync(string? search)
     {
-        var users = await _userManager.Users.ToListAsync();
+        var users = await _userManager.Users.Where(x => !string.IsNullOrWhiteSpace(search) ? x.UserName.Contains(search) : true).ToListAsync();
         var dtos = _mapper.Map<List<AppUserGetDto>>(users);
 
         foreach (var dto in dtos)
@@ -343,6 +339,8 @@ public class AuthService : IAuthService
         return new("User successfully updated");
 
     }
+
+
     public async Task<ResultDto> ChangeUserRoleAsync(ChangeRoleDto dto)
     {
         var user = await _userManager.FindByIdAsync(dto.AppUserId.ToString());
@@ -377,10 +375,38 @@ public class AuthService : IAuthService
         if (user is null)
             throw new NotFoundException($"{userName}-User is not found!");
 
-        var dto=_mapper.Map<AppUserGetDto>(user);
+        var dto = _mapper.Map<AppUserGetDto>(user);
         return dto;
     }
+    public async Task<ResultDto> ChangePasswordByAdminAsync(ChangePasswordByAdminDto dto)
+    {
+        var user = await _getUserById(dto.AppUserId.ToString());
 
+        var result = await _userManager.RemovePasswordAsync(user);
+        if (!result.Succeeded)
+            throw new InvalidInputException(string.Join(" ", result.Errors.Select(e => e.Description)));
+
+
+        result = await _userManager.AddPasswordAsync(user, dto.NewPassword);
+
+        if (!result.Succeeded)
+            throw new InvalidInputException(string.Join(" ", result.Errors.Select(e => e.Description)));
+
+        return new($"{user.Id}-User's password is successfully changed");
+
+    }
+    public async Task<AppUserGetDto> FindByFincode(string fincode)
+    {
+        var user = await _userManager.Users.FirstOrDefaultAsync(x => x.FinCode.ToLower() == fincode.ToLower());
+
+        if (user is null)
+            throw new NotFoundException($"{fincode}-User is not found");
+
+
+        var dto = _mapper.Map<AppUserGetDto>(user);
+
+        return dto;
+    }
     private async Task<AppUser> _getUserById(string id)
     {
         var user = await _userManager.FindByIdAsync(id);
@@ -401,7 +427,7 @@ public class AuthService : IAuthService
     private async Task SendEmailConfirmRequest(AppUser user)
     {
         string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        string path = Path.Combine("http://localhost:3000", "ConfirmEmail", $"AppUserId={user.Id}", $"token={token}");
+        string path = Path.Combine("http://localhost:3000", $"ConfirmEmail?AppUserId={user.Id}&token={token}");
         string body = _confirmEmailBody.Replace("{Replace_Link_1}", path);
         body = body.Replace("{Replace_Link_2}", path);
         body = body.Replace("{Replace_Link_3}", path);
@@ -412,7 +438,7 @@ public class AuthService : IAuthService
     private async Task SendEmailChangeRequest(AppUser user, string email)
     {
         string token = await _userManager.GenerateChangeEmailTokenAsync(user, email); //bu setirde token yaradıb emaili change edir ona görə çağırdığım yerdə emailConfirm ı false vermişəm
-        string path = Path.Combine("http://localhost:3000", "ChangeEmail", $"AppUserId={user.Id}", $"token={token}", $"email={email}");
+        string path = Path.Combine("http://localhost:3000", $"ChangeEmail?AppUserId={user.Id}&token={token}&email={email}");
         string body = _confirmEmailBody.Replace("{Replace_Link_1}", path);
         body = body.Replace("{Replace_Link_2}", path);
         body = body.Replace("{Replace_Link_3}", path);
@@ -438,7 +464,6 @@ public class AuthService : IAuthService
 
         return claims;
     }
-
 
 
 

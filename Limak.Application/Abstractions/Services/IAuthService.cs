@@ -10,7 +10,6 @@ public interface IAuthService
     Task<AccessToken> LoginAsync(LoginDto dto);
     Task<AccessToken> ConfirmEmailAsync(ConfirmEmailDto dto);
     Task<AccessToken> RefreshToken(string refreshToken);
-    Task<ResultDto> CreateRolesAsync();
     Task<AccessToken> ChangePasswordAsync(ChangePasswordDto dto);
     Task<AppUserGetDto> GetCurrentUserAsync();
     Task<ResultDto> SendForgetPasswordMail(ForgetPasswordDto dto);
@@ -24,6 +23,8 @@ public interface IAuthService
     Task<ResultDto> ChangeUserRoleAsync(ChangeRoleDto dto);
     Task<AppUserGetDto> GetUserByIdAsync(int id);
     Task<AppUserGetDto> GetUserByUsernameAsync(string userName);
-    Task<List<AppUserGetDto>> GetAllUsersAsync();
+    Task<List<AppUserGetDto>> GetAllUsersAsync(string? search);
     Task<AppUserGetDto> CheckResetPasswordToken(ForgetPasswordTokenDto dto);
+    Task<ResultDto> ChangePasswordByAdminAsync(ChangePasswordByAdminDto dto);
+    Task<AppUserGetDto> FindByFincode(string Fincode);
 }

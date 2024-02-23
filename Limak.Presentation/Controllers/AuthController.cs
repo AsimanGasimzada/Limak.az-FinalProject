@@ -1,6 +1,5 @@
 ﻿using Limak.Application.Abstractions.Services;
 using Limak.Application.DTOs.AuthDTOs;
-using Limak.Application.DTOs.StripeDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -51,12 +50,6 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
         return Ok(await _service.LoginAsync(dto));
-    }
-
-    [HttpPost("[action]")]
-    public async Task<IActionResult> CreateRoles()
-    {
-        return Ok(await _service.CreateRolesAsync());
     }
 
 
@@ -139,9 +132,9 @@ public class AuthController : ControllerBase
 
     [HttpGet("[action]")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> GetAllUsers()
+    public async Task<IActionResult> GetAllUsers([FromQuery]string? search)
     {
-        return Ok(await _service.GetAllUsersAsync());
+        return Ok(await _service.GetAllUsersAsync(search));
     }
 
     [HttpPut("[action]")]
@@ -151,4 +144,20 @@ public class AuthController : ControllerBase
         return Ok(await _service.ChangeUserRoleAsync(dto));
     }
 
+
+
+    [HttpPut("[action]")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ChangeUserPassword(ChangePasswordByAdminDto dto)
+    {
+        return Ok(await _service.ChangePasswordByAdminAsync(dto));
+    }
+
+
+    [HttpGet("[action]")]
+    [Authorize(Roles = "Admin,Moderator")]
+    public async Task<IActionResult> FindByFincode(string fincode)
+    {
+        return Ok(await _service.FindByFincode(fincode));
+    }
 }

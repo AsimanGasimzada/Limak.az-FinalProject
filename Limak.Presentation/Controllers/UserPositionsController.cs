@@ -1,5 +1,6 @@
 ﻿using Limak.Application.Abstractions.Services;
 using Limak.Application.DTOs.UserPositionDTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Limak.Presentation.Controllers
@@ -25,19 +26,15 @@ namespace Limak.Presentation.Controllers
             return Ok(await _service.GetByIdAsync(id));
         }
         [HttpPost]
+        [Authorize(Roles = "Admin,Moderator")]
         public async Task<IActionResult> CreateAsync([FromForm] UserPositionPostDto dto)
         {
 
             return Ok(await _service.CreateAsync(dto));
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAsync([FromRoute] int id)
-        {
-
-            return Ok(await _service.DeleteAsync(id));
-        }
         [HttpPut]
+        [Authorize(Roles = "Admin,Moderator")]
         public async Task<IActionResult> UpdateAsync([FromForm] UserPositionPutDto dto)
         {
 
